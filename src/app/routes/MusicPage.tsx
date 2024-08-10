@@ -91,20 +91,18 @@ const styles = {
     display: "flex",
     flex: 1,
     flexDirection: "column",
-    padding: 10,
+    padding: 14,
     fontFamily: "sans-serif",
   },
   section: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(55px, 1fr))",
     gap: 14,
-    padding: 14,
   },
   notesSection: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(55px, 1fr))",
     gap: 14,
-    padding: 14,
   },
   formGroup: {
     marginTop: 16,
@@ -125,7 +123,7 @@ const styles = {
   },
   toggleButton: {
     display: "flex",
-    height: 35,
+    // height: 35,
     flexDirection: "column",
     borderRadius: 8,
     textAlign: "center",
@@ -184,7 +182,7 @@ export function MusicPage() {
   return (
     <BasicPage title={"Chord Generator"}>
       <div style={styles.container as CSSProperties}>
-        <div style={{ height: 60 }}>
+        <div style={{ flex: 1 }}>
           <Typography style={styles.chordText as CSSProperties}>
             {chord
               ? `${chord.note} ${chord.quality} ${chord.inversion} ${
@@ -209,7 +207,7 @@ export function MusicPage() {
             </FlatToggleButton>
           ))}
         </div>
-        <Divider />
+        <Divider style={{ margin: "7px 0" }} />
         <div style={styles.section}>
           {Object.values(Inversion).map((inversion) => (
             <FlatToggleButton
@@ -227,7 +225,7 @@ export function MusicPage() {
             </FlatToggleButton>
           ))}
         </div>
-        <Divider />
+        <Divider style={{ margin: "7px 0" }} />
         <div style={styles.section}>
           {Object.values(Quality).map((quality) => (
             <FlatToggleButton
@@ -245,7 +243,6 @@ export function MusicPage() {
             </FlatToggleButton>
           ))}
         </div>
-        <Divider />
         <FormGroup style={styles.formGroup}>
           <FormControlLabel
             control={
