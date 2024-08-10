@@ -45,8 +45,8 @@ export function App() {
         path: "/music",
         element: <MusicPage />,
       },
-    ],
-    { basename: window.location.pathname }
+    ]
+    // { basename: window.location.pathname }
   )
 
   console.log(router)
