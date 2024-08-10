@@ -21,6 +21,7 @@ import {
   Paper,
 } from "@mui/material"
 import { ReactNode, useState } from "react"
+import { Link } from "react-router-dom"
 
 type Props = {
   title: string
@@ -60,37 +61,37 @@ export function BasicPage(props: Props) {
         }}
       >
         <List>
-          <ListItemButton href="/">
+          <ListItemButton component={Link} to="/">
             <ListItemIcon>
               <Home />
             </ListItemIcon>
             <ListItemText>Home</ListItemText>
           </ListItemButton>
-          <ListItemButton href="todo">
+          <ListItemButton component={Link} to="/todo">
             <ListItemIcon>
               <Checklist />
             </ListItemIcon>
             <ListItemText>Todo</ListItemText>
           </ListItemButton>
-          <ListItemButton href="counter">
+          <ListItemButton component={Link} to="/counter">
             <ListItemIcon>
               <Numbers />
             </ListItemIcon>
             <ListItemText>Counter</ListItemText>
           </ListItemButton>
-          <ListItemButton href="rating">
+          <ListItemButton component={Link} to="/rating">
             <ListItemIcon>
               <MoodBad />
             </ListItemIcon>
             <ListItemText>Rating</ListItemText>
           </ListItemButton>
-          <ListItemButton href="shifts">
+          <ListItemButton component={Link} to="/shifts">
             <ListItemIcon>
               <MoodBad />
             </ListItemIcon>
             <ListItemText>Shifts</ListItemText>
           </ListItemButton>
-          <ListItemButton href="music">
+          <ListItemButton component={Link} to="/music">
             <ListItemIcon>
               <MusicNote />
             </ListItemIcon>
