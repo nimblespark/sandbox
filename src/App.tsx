@@ -49,8 +49,6 @@ export function App() {
     // { basename: window.location.pathname }
   )
 
-  console.log(router)
-
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <RouterProvider router={router} />
