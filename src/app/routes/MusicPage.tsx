@@ -96,16 +96,15 @@ const styles = {
     fontFamily: "sans-serif",
   },
   section: {
-    flex: 2,
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(60px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fill, minmax(60px, 1fr))",
     gridTemplateRows: "repeat(auto-fit, minmax(40px, 1fr))",
     gap: 14,
   },
   notesSection: {
     display: "grid",
-    flex: 2,
-    gridTemplateColumns: "repeat(auto-fit, minmax(60px, 1fr))",
+
+    gridTemplateColumns: "repeat(auto-fill, minmax(60px, 1fr))",
     gridTemplateRows: "repeat(auto-fit, minmax(40px, 1fr))",
 
     gap: 14,
@@ -120,7 +119,6 @@ const styles = {
     transition: "background-color 0.3s, transform 0.1s",
     cursor: "pointer",
     flex: 1,
-    marginTop: "auto",
   },
   chordText: {
     fontSize: 20,
@@ -128,7 +126,6 @@ const styles = {
     textAlign: "center",
   },
   toggleButton: {
-    flex: 1,
     maxHeight: "50px",
     display: "flex",
     flexDirection: "column",
@@ -140,6 +137,7 @@ const styles = {
     cursor: "pointer",
     transition: "background-color 0.3s, transform 0.1s",
   },
+  toggleButtonsContainer: {},
   toggleButtonChecked: {
     backgroundColor: "#9df",
   },
@@ -189,7 +187,14 @@ export function MusicPage() {
   return (
     <BasicPage title={"Chord Generator"}>
       <div style={styles.container as CSSProperties}>
-        <div style={{ marginBottom: "auto" }}>
+        <div
+          style={{
+            flex: 1,
+            layout: "flex",
+            flexDirection: "column",
+            alignContent: "center",
+          }}
+        >
           <Typography style={styles.chordText as CSSProperties}>
             {chord
               ? `${chord.note} ${chord.quality ? chord.quality : ""} ${
@@ -199,56 +204,60 @@ export function MusicPage() {
           </Typography>
         </div>
 
-        <div style={styles.notesSection}>
-          {Object.values(Note).map((note) => (
-            <FlatToggleButton
-              key={note}
-              checked={notes.includes(note)}
-              onChange={() =>
-                notes.includes(note)
-                  ? setNotes((notes) => notes.filter((n) => n !== note))
-                  : setNotes((notes) => notes.concat(note))
-              }
-            >
-              {note}
-            </FlatToggleButton>
-          ))}
-        </div>
-        <Divider style={{ minHeight: "5px", margin: "7px 0" }} />
-        <div style={styles.section}>
-          {Object.values(Inversion).map((inversion) => (
-            <FlatToggleButton
-              key={inversion}
-              checked={inversions.includes(inversion)}
-              onChange={() =>
-                inversions.includes(inversion)
-                  ? setInversions((inversions) =>
-                      inversions.filter((n) => n !== inversion)
-                    )
-                  : setInversions((inversions) => inversions.concat(inversion))
-              }
-            >
-              {inversion}
-            </FlatToggleButton>
-          ))}
-        </div>
-        <Divider style={{ minHeight: "5px", margin: "7px 0" }} />
-        <div style={styles.section}>
-          {Object.values(Quality).map((quality) => (
-            <FlatToggleButton
-              key={quality}
-              checked={qualities.includes(quality)}
-              onChange={() =>
-                qualities.includes(quality)
-                  ? setQualities((qualities) =>
-                      qualities.filter((n) => n !== quality)
-                    )
-                  : setQualities((qualities) => qualities.concat(quality))
-              }
-            >
-              {quality}
-            </FlatToggleButton>
-          ))}
+        <div style={styles.toggleButtonsContainer}>
+          <div style={styles.notesSection}>
+            {Object.values(Note).map((note) => (
+              <FlatToggleButton
+                key={note}
+                checked={notes.includes(note)}
+                onChange={() =>
+                  notes.includes(note)
+                    ? setNotes((notes) => notes.filter((n) => n !== note))
+                    : setNotes((notes) => notes.concat(note))
+                }
+              >
+                {note}
+              </FlatToggleButton>
+            ))}
+          </div>
+          <Divider style={{ minHeight: "5px", margin: "7px 0" }} />
+          <div style={styles.section}>
+            {Object.values(Inversion).map((inversion) => (
+              <FlatToggleButton
+                key={inversion}
+                checked={inversions.includes(inversion)}
+                onChange={() =>
+                  inversions.includes(inversion)
+                    ? setInversions((inversions) =>
+                        inversions.filter((n) => n !== inversion)
+                      )
+                    : setInversions((inversions) =>
+                        inversions.concat(inversion)
+                      )
+                }
+              >
+                {inversion}
+              </FlatToggleButton>
+            ))}
+          </div>
+          <Divider style={{ minHeight: "5px", margin: "7px 0" }} />
+          <div style={styles.section}>
+            {Object.values(Quality).map((quality) => (
+              <FlatToggleButton
+                key={quality}
+                checked={qualities.includes(quality)}
+                onChange={() =>
+                  qualities.includes(quality)
+                    ? setQualities((qualities) =>
+                        qualities.filter((n) => n !== quality)
+                      )
+                    : setQualities((qualities) => qualities.concat(quality))
+                }
+              >
+                {quality}
+              </FlatToggleButton>
+            ))}
+          </div>
         </div>
         <FormGroup style={styles.formGroup}>
           <FormControlLabel
@@ -262,7 +271,7 @@ export function MusicPage() {
           />
         </FormGroup>
 
-        <div style={{ display: "flex", marginTop: "auto" }}>
+        <div style={{ display: "flex" }}>
           <Button
             style={styles.button}
             size="large"
