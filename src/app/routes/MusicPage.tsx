@@ -85,6 +85,7 @@ const defaultQualities = [
 ]
 
 import React from "react"
+import { maxHeight } from "@mui/system"
 
 const styles = {
   container: {
@@ -95,13 +96,18 @@ const styles = {
     fontFamily: "sans-serif",
   },
   section: {
+    flex: 2,
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(55px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(60px, 1fr))",
+    gridTemplateRows: "repeat(auto-fit, minmax(50px, 1fr))",
     gap: 14,
   },
   notesSection: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(55px, 1fr))",
+    flex: 2,
+    gridTemplateColumns: "repeat(auto-fit, minmax(60px, 1fr))",
+    gridTemplateRows: "repeat(auto-fit, minmax(50px, 1fr))",
+
     gap: 14,
   },
   formGroup: {
@@ -122,8 +128,9 @@ const styles = {
     textAlign: "center",
   },
   toggleButton: {
+    flex: 1,
+    maxHeight: "50px",
     display: "flex",
-    // height: 35,
     flexDirection: "column",
     borderRadius: 8,
     textAlign: "center",
@@ -182,12 +189,12 @@ export function MusicPage() {
   return (
     <BasicPage title={"Chord Generator"}>
       <div style={styles.container as CSSProperties}>
-        <div style={{ flex: 1 }}>
+        <div style={{ marginBottom: "auto" }}>
           <Typography style={styles.chordText as CSSProperties}>
             {chord
-              ? `${chord.note} ${chord.quality} ${chord.inversion} ${
-                  chord.string ? ` on ${chord.string} string` : ""
-                }`
+              ? `${chord.note} ${chord.quality ? chord.quality : ""} ${
+                  chord.inversion
+                } ${chord.string ? ` on ${chord.string} string` : ""}`
               : "Generate a chord!"}
           </Typography>
         </div>
@@ -207,7 +214,7 @@ export function MusicPage() {
             </FlatToggleButton>
           ))}
         </div>
-        <Divider style={{ margin: "7px 0" }} />
+        <Divider style={{ margin: "7px 0", minHeight: "10px" }} />
         <div style={styles.section}>
           {Object.values(Inversion).map((inversion) => (
             <FlatToggleButton
@@ -225,7 +232,7 @@ export function MusicPage() {
             </FlatToggleButton>
           ))}
         </div>
-        <Divider style={{ margin: "7px 0" }} />
+        <Divider style={{ margin: "7px 0", minHeight: "10px" }} />
         <div style={styles.section}>
           {Object.values(Quality).map((quality) => (
             <FlatToggleButton
