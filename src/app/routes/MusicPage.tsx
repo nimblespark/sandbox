@@ -99,14 +99,14 @@ const styles = {
     flex: 2,
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(60px, 1fr))",
-    gridTemplateRows: "repeat(auto-fit, minmax(50px, 1fr))",
+    gridTemplateRows: "repeat(auto-fit, minmax(40px, 1fr))",
     gap: 14,
   },
   notesSection: {
     display: "grid",
     flex: 2,
     gridTemplateColumns: "repeat(auto-fit, minmax(60px, 1fr))",
-    gridTemplateRows: "repeat(auto-fit, minmax(50px, 1fr))",
+    gridTemplateRows: "repeat(auto-fit, minmax(40px, 1fr))",
 
     gap: 14,
   },
@@ -136,7 +136,7 @@ const styles = {
     textAlign: "center",
     justifyContent: "center",
     fontSize: 15,
-    padding: 10,
+    padding: 7,
     cursor: "pointer",
     transition: "background-color 0.3s, transform 0.1s",
   },
@@ -214,7 +214,7 @@ export function MusicPage() {
             </FlatToggleButton>
           ))}
         </div>
-        <Divider style={{ margin: "7px 0", minHeight: "10px" }} />
+        <Divider style={{ minHeight: "5px", margin: "7px 0" }} />
         <div style={styles.section}>
           {Object.values(Inversion).map((inversion) => (
             <FlatToggleButton
@@ -232,7 +232,7 @@ export function MusicPage() {
             </FlatToggleButton>
           ))}
         </div>
-        <Divider style={{ margin: "7px 0", minHeight: "10px" }} />
+        <Divider style={{ minHeight: "5px", margin: "7px 0" }} />
         <div style={styles.section}>
           {Object.values(Quality).map((quality) => (
             <FlatToggleButton
