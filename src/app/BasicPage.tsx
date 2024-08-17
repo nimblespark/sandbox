@@ -4,6 +4,7 @@ import {
   Menu,
   MoodBad,
   MusicNote,
+  MusicNoteTwoTone,
   Numbers,
 } from "@mui/icons-material"
 import {
@@ -96,6 +97,12 @@ export function BasicPage(props: Props) {
               <MusicNote />
             </ListItemIcon>
             <ListItemText>Chord Generator</ListItemText>
+          </ListItemButton>
+          <ListItemButton component={Link} to="/alpha">
+            <ListItemIcon>
+              <MusicNoteTwoTone />
+            </ListItemIcon>
+            <ListItemText>Alpha</ListItemText>
           </ListItemButton>
         </List>
       </Drawer>

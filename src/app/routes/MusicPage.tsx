@@ -190,7 +190,7 @@ export function MusicPage() {
         <div
           style={{
             flex: 1,
-            layout: "flex",
+            display: "flex",
             flexDirection: "column",
             alignContent: "center",
           }}
