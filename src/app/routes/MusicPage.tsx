@@ -300,9 +300,9 @@ export function MusicPage() {
             onClick={() => setAlphaDialogOpen(false)}
             sx={{
               position: "absolute",
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
+              right: 9,
+              top: 9,
+              color: (theme) => theme.palette.grey[600],
             }}
           >
             <Close />
