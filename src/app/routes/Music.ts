@@ -1,4 +1,5 @@
-const fretsCount = 24
+const fretsCount = 14
+const lowestFret = 1
 
 type Letter = "A" | "B" | "C" | "D" | "E" | "F" | "G"
 const Letter = {
@@ -180,6 +181,22 @@ export enum Quality {
   Half = "Half-Dim7",
   Full = "Dim7",
 }
+export namespace Quality {
+  export function toLeadSheet(quality: Quality) {
+    switch (quality) {
+      case Quality.Maj7:
+        return "△7"
+      case Quality.Dom7:
+        return "7"
+      case Quality.Min7:
+        return "m7"
+      case Quality.Half:
+        return "ø7"
+      case Quality.Full:
+        return "°7"
+    }
+  }
+}
 
 export type String = 1 | 2 | 3 | 4 | 5 | 6
 export namespace String {
@@ -239,7 +256,7 @@ const GuitarNote = {
     console.log(fret)
     const listOfFrets = []
     while (fret <= fretsCount) {
-      if (fret >= 0) listOfFrets.push(fret)
+      if (fret >= lowestFret) listOfFrets.push(fret)
       currentNote += Interval.octave
       fret = currentNote - Note.toNoteNumber(String.firstNote(string))
     }
@@ -247,7 +264,7 @@ const GuitarNote = {
   },
 }
 
-console.log(GuitarNote.onString(5, note("C")))
+console.log(GuitarNote.onString(2, note("B")).map((note) => note.fret))
 
 function g(string: String, fret: number): GuitarNote {
   return { string, fret }
@@ -280,9 +297,10 @@ const ChordPattern = {
                 return [g(6, 0), g(4, 1), g(3, 1), g(2, 0)]
               case Inversion.First:
                 return [g(6, 0), g(4, -2), g(3, 0), g(2, 0)]
-
-              default:
-                return []
+              case Inversion.Second:
+                return [g(6, 0), g(5, 0), g(4, -1), g(3, 1)]
+              case Inversion.Third:
+                return [g(6, 0), g(5, 0), g(4, -2), g(3, -2)]
             }
           case Quality.Dom7:
             switch (inversion) {
@@ -290,6 +308,10 @@ const ChordPattern = {
                 return [g(6, 0), g(4, 0), g(3, 1), g(2, 0)]
               case Inversion.First:
                 return [g(6, 0), g(4, -2), g(3, 0), g(2, -1)]
+              case Inversion.Second:
+                return [g(6, 0), g(4, -1), g(3, 0), g(2, -2)]
+              case Inversion.Third:
+                return [g(6, 0), g(4, -1), g(3, -1), g(2, -1)]
             }
           case Quality.Min7:
             switch (inversion) {
@@ -297,6 +319,10 @@ const ChordPattern = {
                 return [g(6, 0), g(4, 0), g(3, 0), g(2, 0)]
               case Inversion.First:
                 return [g(6, 0), g(4, -1), g(3, 1), g(2, 0)]
+              case Inversion.Second:
+                return [g(6, 0), g(4, -2), g(3, 0), g(2, -2)]
+              case Inversion.Third:
+                return [g(6, 0), g(4, -1), g(3, -1), g(2, -2)]
             }
 
           case Quality.Half:
@@ -305,6 +331,10 @@ const ChordPattern = {
                 return [g(6, 0), g(4, 0), g(3, 0), g(2, -1)]
               case Inversion.First:
                 return [g(6, 0), g(4, -1), g(3, 0), g(2, 0)]
+              case Inversion.Second:
+                return [g(6, 0), g(4, -1), g(3, 1), g(2, -1)]
+              case Inversion.Third:
+                return [g(6, 0), g(4, -2), g(3, -1), g(2, -2)]
             }
           case Quality.Full:
             switch (inversion) {
@@ -312,10 +342,11 @@ const ChordPattern = {
                 return [g(6, 0), g(4, -1), g(3, 0), g(2, -1)]
               case Inversion.First:
                 return [g(6, 0), g(4, -1), g(3, 0), g(2, -1)]
+              case Inversion.Second:
+                return [g(6, 0), g(4, -1), g(3, 0), g(2, -1)]
+              case Inversion.Third:
+                return [g(6, 0), g(4, -1), g(3, 0), g(2, -1)]
             }
-
-          default:
-            return []
         }
 
       case 5:
@@ -324,34 +355,55 @@ const ChordPattern = {
             switch (inversion) {
               case Inversion.Root:
                 return [g(5, 0), g(4, 2), g(3, 1), g(2, 2)]
-
-              default:
-                return []
+              case Inversion.First:
+                return [g(5, 0), g(4, 2), g(3, -2), g(2, 1)]
+              case Inversion.Second:
+                return [g(5, 0), g(4, 0), g(3, -1), g(2, 2)]
+              case Inversion.Third:
+                return [g(5, 0), g(4, 0), g(3, -2), g(2, -1)]
             }
           case Quality.Dom7:
             switch (inversion) {
               case Inversion.Root:
                 return [g(5, 0), g(4, 2), g(3, 0), g(2, 2)]
+              case Inversion.First:
+                return [g(5, 0), g(4, 1), g(3, -2), g(2, 1)]
+              case Inversion.Second:
+                return [g(5, 0), g(4, 0), g(3, -1), g(2, 2)]
+              case Inversion.Third:
+                return [g(5, 0), g(4, 1), g(3, -1), g(2, 0)]
             }
           case Quality.Min7:
             switch (inversion) {
               case Inversion.Root:
                 return [g(5, 0), g(4, 2), g(3, 0), g(2, 1)]
+              case Inversion.First:
+                return [g(5, 0), g(4, 2), g(3, -1), g(2, 2)]
+              case Inversion.Second:
+                return [g(5, 0), g(4, 0), g(3, -2), g(2, 1)]
+              case Inversion.Third:
+                return [g(5, 0), g(4, 0), g(3, -1), g(2, 0)]
             }
 
           case Quality.Half:
             switch (inversion) {
               case Inversion.Root:
                 return [g(5, 0), g(4, 1), g(3, 0), g(2, 1)]
+              case Inversion.First:
+                return [g(5, 0), g(4, 2), g(3, -1), g(2, 1)]
+              case Inversion.Second:
+                return [g(5, 0), g(4, 1), g(3, -1), g(2, 2)]
+              case Inversion.Third:
+                return [g(5, 0), g(4, 0), g(3, -2), g(2, 0)]
             }
           case Quality.Full:
             switch (inversion) {
               case Inversion.Root:
-                return [g(5, 0), g(4, 11), g(3, -1), g(2, 1)]
+              case Inversion.First:
+              case Inversion.Second:
+              case Inversion.Third:
+                return [g(5, 0), g(4, 1), g(3, -1), g(2, 1)]
             }
-
-          default:
-            return []
         }
 
       default:
@@ -360,35 +412,67 @@ const ChordPattern = {
   },
 }
 
-export type GuitarChord = GuitarNote[]
+export type GuitarChord = { name?: string; notes: GuitarNote[] }
 export const GuitarChord = {
   toTex(chord: GuitarChord) {
-    return `(${chord.map((note) => GuitarNote.toTex(note) + " ").join("")})`
+    return `(${chord.notes
+      .map((note) => GuitarNote.toTex(note) + " ")
+      .join("")}).1${chord.name && `{ch "${chord.name}"}`}|`
   },
   /** Generates all the guitar chords that fit the parameters */
   generate(
     root: Note,
     quality: Quality,
     string?: String,
-    inversion: Inversion = Inversion.Root
+    inversion?: Inversion
   ): GuitarChord[] {
-    const bassNote = Inversion.bassNote(inversion, quality, root)
-    const rootList = string
-      ? GuitarNote.onString(string, bassNote)
-      : GuitarNote.onString(6, bassNote).concat(
-          GuitarNote.onString(5, bassNote)
-        )
-    const chords = rootList.map((root) =>
-      ChordPattern.generate(root.string, quality, inversion).map((note) => ({
-        string: note.string,
-        fret: note.fret + root.fret,
-      }))
-    )
+    var chords: GuitarChord[] = []
+    const inversions = inversion
+      ? [inversion]
+      : [Inversion.Root, Inversion.First, Inversion.Second, Inversion.Third]
+
+    for (const inversion of inversions) {
+      const bassNote = Inversion.bassNote(inversion, quality, root)
+      const bassList = string
+        ? GuitarNote.onString(string, bassNote)
+        : GuitarNote.onString(6, bassNote).concat(
+            GuitarNote.onString(5, bassNote)
+          )
+      chords = chords.concat(
+        bassList.map((bass) => ({
+          name: `${Note.toDisplayString(root)}${Quality.toLeadSheet(quality)}${
+            inversion === Inversion.Root
+              ? ""
+              : `/${Note.toDisplayString(bassNote)}`
+          }`,
+          notes: ChordPattern.generate(bass.string, quality, inversion).map(
+            (note) => ({
+              string: note.string,
+              fret: note.fret + bass.fret,
+            })
+          ),
+        }))
+      )
+    }
 
     // If any of the chords are invalid, filter them out
-    return chords.filter(
-      (chord) => !chord.some((note) => note.fret < 0 || note.fret > fretsCount)
-    )
+    return chords
+      .filter(
+        (chord) =>
+          !chord.notes.some(
+            (note) => note.fret < lowestFret || note.fret > fretsCount
+          )
+      )
+      .sort(
+        (chord1, chord2) =>
+          Math.min(...chord1.notes.map((note) => note.fret)) -
+          Math.min(...chord2.notes.map((note) => note.fret))
+      )
+      .sort(
+        (chord2, chord1) =>
+          Math.max(...chord1.notes.map((note) => note.string)) -
+          Math.max(...chord2.notes.map((note) => note.string))
+      )
   },
 }
 

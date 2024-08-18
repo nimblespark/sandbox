@@ -182,7 +182,7 @@ export function MusicPage() {
               {chord
                 ? `${Note.toDisplayString(chord.note)} ${
                     chord.quality ? chord.quality : ""
-                  } ${chord.inversion} ${
+                  } ${chord.inversion ? chord.inversion : ""} ${
                     chord.string ? ` on ${chord.string} string` : ""
                   }`
                 : "Generate a chord!"}
@@ -233,7 +233,7 @@ export function MusicPage() {
           </div>
           <Divider style={{ minHeight: "5px", margin: "7px 0" }} />
           <div style={styles.section}>
-            {Object.values(Quality).map((quality) => (
+            {defaultQualities.map((quality) => (
               <FlatToggleButton
                 key={quality}
                 checked={qualities.includes(quality)}
@@ -286,13 +286,14 @@ export function MusicPage() {
       </div>
       {chord && alphaDialogOpen && (
         <Dialog
+          maxWidth="lg"
           fullScreen={isMobile}
           open={alphaDialogOpen}
           onClose={() => setAlphaDialogOpen(false)}
         >
           <DialogTitle>{`${Note.toDisplayString(chord.note)} ${
             chord.quality ? chord.quality : ""
-          } ${chord.inversion} ${
+          } ${chord.inversion ? chord.inversion : ""} ${
             chord.string ? ` on ${chord.string} string` : ""
           }`}</DialogTitle>
           <IconButton

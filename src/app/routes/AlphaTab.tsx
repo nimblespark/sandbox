@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react"
 import "../AlphaTab.css"
 import { AlphaTabApi, Settings } from "@coderline/alphatab"
 import { BasicPage } from "../BasicPage"
-import { Button, Select } from "@mui/material"
+import { Button, Select, Slider } from "@mui/material"
 import {
   GuitarChord,
   GuitarMusic,
@@ -58,9 +58,24 @@ export function AlphaTab(props: Props) {
       //       3.4 0.3 2.3 0.2 | 1.2 3.2 0.1 1.1 |
       //       3.1.1
       // `
-      console.log(GuitarMusic.toTex(guitarMusic))
 
-      apiRef.current.tex(`\\tempo 50 .  ${GuitarMusic.toTex(guitarMusic)}`)
+      const tex = `
+      \\tempo 120
+      
+      . 
+      
+
+      ${GuitarMusic.toTex(guitarMusic)}`
+
+      console.log(tex)
+
+      apiRef.current.metronomeVolume = 1.0
+      apiRef.current.isLooping = true
+      apiRef.current.playbackSpeed = 1.0
+
+      apiRef.current.countInVolume = 1.0
+
+      apiRef.current.tex(tex)
 
       // setApi(api)
     }
@@ -75,9 +90,27 @@ export function AlphaTab(props: Props) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
-      <div style={{ width: 600 }} ref={elementRef} />
+    <>
+      <div
+        style={{ display: "flex", flexDirection: "column", overflow: "auto" }}
+      >
+        <div style={{ width: 800, overflow: "auto" }} ref={elementRef} />
+      </div>
+      <div style={{ display: "flex" }}>
+        <Slider
+          defaultValue={1}
+          step={0.1}
+          min={0.1}
+          max={2.0}
+          style={{ margin: "50px", flex: 1 }}
+          onChangeCommitted={(_, value) => {
+            if (apiRef.current) apiRef.current.playbackSpeed = value as number
+          }}
+        >
+          Tempo
+        </Slider>
+      </div>
       <Button onClick={playPause}>Play/Pause</Button>
-    </div>
+    </>
   )
 }

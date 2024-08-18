@@ -11,8 +11,8 @@
   
   .at-cursor-beat {
     /* Defines the beat cursor */
-    background: rgba(64, 64, 255, 0.75);
-    width: 3px;
+    background: rgba(64, 64, 255, 0.0);
+    width: 0px;
   }
   
   .at-highlight * {

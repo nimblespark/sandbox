@@ -5,5 +5,5 @@ import { alphaTab } from "@coderline/alphatab/vite";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), alphaTab()],
-  base: "/sandbox/",
+  base: "",
 });
