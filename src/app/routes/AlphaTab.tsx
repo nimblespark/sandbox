@@ -60,7 +60,7 @@ export function AlphaTab(props: Props) {
       // `
       console.log(GuitarMusic.toTex(guitarMusic))
 
-      apiRef.current.tex(`\\tempo 60 .  ${GuitarMusic.toTex(guitarMusic)}`)
+      apiRef.current.tex(`\\tempo 50 .  ${GuitarMusic.toTex(guitarMusic)}`)
 
       // setApi(api)
     }
