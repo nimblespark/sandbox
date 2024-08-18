@@ -2,9 +2,12 @@ import {
   Button,
   Card,
   Checkbox,
+  Dialog,
+  DialogTitle,
   Divider,
   FormControlLabel,
   FormGroup,
+  IconButton,
   Switch,
   Typography,
 } from "@mui/material"
@@ -19,73 +22,44 @@ import {
 } from "react-hook-form"
 import { BasicPage } from "../BasicPage"
 
-enum Note {
-  C = "C",
-  Db = "D♭",
-  D = "D",
-  Eb = "E♭",
-  E = "E",
-  F = "F",
-  Gb = "G♭",
-  G = "G",
-  Ab = "A♭",
-  A = "A",
-  Bb = "B♭",
-  B = "B",
-}
-
-enum Inversion {
-  root = "Root",
-  first = "1st",
-  second = "2nd",
-  third = "3rd",
-}
-
-enum Quality {
-  maj7 = "Maj7",
-  dom7 = "Dom7",
-  min7 = "Min7",
-  half = "Half-Dim7",
-  full = "Dim7",
-}
-
-enum String {
-  fifth = "fifth",
-  sixth = "sixth",
-}
+type String = 5 | 6
 
 const defaultNotes: Note[] = [
-  Note.C,
-  Note.Db,
-  Note.D,
-  Note.Eb,
-  Note.E,
-  Note.F,
-  Note.Gb,
-  Note.G,
-  Note.Ab,
-  Note.A,
-  Note.Bb,
-  Note.B,
+  note("C"),
+  note("D", Accidental.Flat),
+  note("D"),
+  note("E", Accidental.Flat),
+  note("E"),
+  note("F"),
+  note("G", Accidental.Flat),
+  note("G"),
+  note("A", Accidental.Flat),
+  note("A"),
+  note("B", Accidental.Flat),
+  note("B"),
 ]
 
 const defaultInversions = [
-  Inversion.root,
-  Inversion.first,
-  Inversion.second,
-  Inversion.third,
+  Inversion.Root,
+  Inversion.First,
+  Inversion.Second,
+  Inversion.Third,
 ]
 
 const defaultQualities = [
-  Quality.maj7,
-  Quality.dom7,
-  Quality.min7,
-  Quality.half,
-  Quality.full,
+  Quality.Maj7,
+  Quality.Dom7,
+  Quality.Min7,
+  Quality.Half,
+  Quality.Full,
 ]
 
 import React from "react"
 import { maxHeight } from "@mui/system"
+import { Accidental, Inversion, note, Note, Quality } from "./Music"
+import { AlphaTab } from "./AlphaTab"
+import { Close } from "@mui/icons-material"
+import { useViewport } from "../../useViewport"
 
 const styles = {
   container: {
@@ -124,6 +98,7 @@ const styles = {
     fontSize: 20,
     marginTop: 5,
     textAlign: "center",
+    textTransform: "none",
   },
   toggleButton: {
     maxHeight: "50px",
@@ -163,6 +138,9 @@ export function MusicPage() {
   const [inversions, setInversions] = useState<Inversion[]>(defaultInversions)
   const [qualities, setQualities] = useState<Quality[]>(defaultQualities)
   const [includeString, setIncludeString] = useState<boolean>(true)
+  const [alphaDialogOpen, setAlphaDialogOpen] = useState<boolean>(false)
+
+  const { isMobile } = useViewport()
 
   const [chord, setChord] = useState<{
     note: Note
@@ -178,8 +156,8 @@ export function MusicPage() {
       quality: qualities[Math.floor(Math.random() * qualities.length)],
       string: includeString
         ? Math.floor(Math.random() * 2) === 0
-          ? String.sixth
-          : String.fifth
+          ? 6
+          : 5
         : null,
     })
   }
@@ -195,34 +173,47 @@ export function MusicPage() {
             alignContent: "center",
           }}
         >
-          <Typography style={styles.chordText as CSSProperties}>
-            {chord
-              ? `${chord.note} ${chord.quality ? chord.quality : ""} ${
-                  chord.inversion
-                } ${chord.string ? ` on ${chord.string} string` : ""}`
-              : "Generate a chord!"}
-          </Typography>
+          <Button
+            style={styles.chordText as CSSProperties}
+            disabled={!chord}
+            onClick={() => setAlphaDialogOpen(true)}
+          >
+            <Typography>
+              {chord
+                ? `${Note.toDisplayString(chord.note)} ${
+                    chord.quality ? chord.quality : ""
+                  } ${chord.inversion} ${
+                    chord.string ? ` on ${chord.string} string` : ""
+                  }`
+                : "Generate a chord!"}
+            </Typography>
+          </Button>
         </div>
 
         <div style={styles.toggleButtonsContainer}>
           <div style={styles.notesSection}>
-            {Object.values(Note).map((note) => (
+            {defaultNotes.map((note) => (
               <FlatToggleButton
-                key={note}
+                key={Note.toDisplayString(note)}
                 checked={notes.includes(note)}
                 onChange={() =>
                   notes.includes(note)
-                    ? setNotes((notes) => notes.filter((n) => n !== note))
+                    ? setNotes((notes) =>
+                        notes.filter(
+                          (n) =>
+                            Note.toNoteNumber(n) !== Note.toNoteNumber(note)
+                        )
+                      )
                     : setNotes((notes) => notes.concat(note))
                 }
               >
-                {note}
+                {Note.toDisplayString(note)}
               </FlatToggleButton>
             ))}
           </div>
           <Divider style={{ minHeight: "5px", margin: "7px 0" }} />
           <div style={styles.section}>
-            {Object.values(Inversion).map((inversion) => (
+            {defaultInversions.map((inversion) => (
               <FlatToggleButton
                 key={inversion}
                 checked={inversions.includes(inversion)}
@@ -293,6 +284,37 @@ export function MusicPage() {
           </Button>
         </div>
       </div>
+      {chord && alphaDialogOpen && (
+        <Dialog
+          fullScreen={isMobile}
+          open={alphaDialogOpen}
+          onClose={() => setAlphaDialogOpen(false)}
+        >
+          <DialogTitle>{`${Note.toDisplayString(chord.note)} ${
+            chord.quality ? chord.quality : ""
+          } ${chord.inversion} ${
+            chord.string ? ` on ${chord.string} string` : ""
+          }`}</DialogTitle>
+          <IconButton
+            aria-label="close"
+            onClick={() => setAlphaDialogOpen(false)}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <Close />
+          </IconButton>
+          <AlphaTab
+            note={chord.note}
+            inversion={chord.inversion}
+            string={chord.string}
+            quality={chord.quality}
+          />
+        </Dialog>
+      )}
     </BasicPage>
   )
 }

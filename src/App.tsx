@@ -12,7 +12,7 @@ import { ShiftsPage } from "./app/routes/ShiftsPage"
 import { LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { MusicPage } from "./app/routes/MusicPage"
-import { AlphaTab } from "./app/routes/AlphaPage"
+import { AlphaTab } from "./app/routes/AlphaTab"
 import { useEffect, useRef, useState } from "react"
 import { AlphaTabApi, Settings } from "@coderline/alphatab"
 
@@ -87,10 +87,10 @@ export function App() {
         path: "/music",
         element: <MusicPage />,
       },
-      {
-        path: "/alpha",
-        element: <AlphaTab onPlayPause={playPause} elementRef={elementRef} />,
-      },
+      // {
+      //   path: "/alpha:chord",
+      //   element: <AlphaTab />,
+      // },
     ]
     // { basename: window.location.pathname }
   )
