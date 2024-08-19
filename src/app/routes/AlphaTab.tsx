@@ -41,7 +41,7 @@ export function AlphaTab(props: Props) {
       apiRef.current = new AlphaTabApi(elementRef.current, {
         core: {
           // file: "https://www.alphatab.net/files/canon.gp",
-          fontDirectory: "/font/",
+          fontDirectory: "./font/",
         },
         player: {
           enablePlayer: true,
