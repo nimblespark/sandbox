@@ -47,7 +47,7 @@ export function AlphaTab(props: Props) {
           enablePlayer: true,
           enableCursor: true,
           enableUserInteraction: true,
-          soundFont: "/soundfont/sonivox.sf2",
+          soundFont: "./soundfont/sonivox.sf2",
         },
       } as Settings)
 
