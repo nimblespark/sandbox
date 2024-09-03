@@ -87,7 +87,15 @@ export function MathQuiz() {
           width={800}
           height={300}
         />
-        <Quiz questions={[{ name: "p-value", correct: pValue }]} />
+        <Quiz
+          questions={[
+            { name: "p-value", correct: pValue },
+            {
+              name: "sample proportion",
+              correct: Math.round(sampleProportion * 100) / 100,
+            },
+          ]}
+        />
       </div>
     </BasicPage>
   )

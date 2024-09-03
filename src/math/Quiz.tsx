@@ -27,26 +27,29 @@ export function Quiz({ questions }: Props) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", width: 400 }}>
+    <div style={{ display: "flex", flexDirection: "column", width: 600 }}>
       {questions.map((question) => {
         return (
           <>
             <Typography>
               What is the {question.name}? (Round to 2 decimals if necessary)
             </Typography>
-            <Controller
-              control={control}
-              name={question.name}
-              render={({ field }) => {
-                return (
-                  <TextField
-                    type="number"
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
-                )
-              }}
-            />
+            <div>
+              <Controller
+                control={control}
+                name={question.name}
+                render={({ field }) => {
+                  return (
+                    <TextField
+                      type="number"
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )
+                }}
+              />
+              <ViewSolutionButton solution={question.correct} />
+            </div>
           </>
         )
       })}
@@ -55,5 +58,26 @@ export function Quiz({ questions }: Props) {
       {correct === true && <Check style={{ color: "green" }} />}
       {correct === false && <Close style={{ color: "red" }} />}
     </div>
+  )
+}
+
+type ViewSolutionButtonProps = {
+  solution: number
+}
+
+function ViewSolutionButton({ solution }: ViewSolutionButtonProps) {
+  const [view, setView] = useState(false)
+  return (
+    <>
+      {view === false && (
+        <Button
+          onClick={() => setView(true)}
+          style={{ textTransform: "lowercase" }}
+        >
+          View solution
+        </Button>
+      )}
+      {view === true && <>{solution}</>}
+    </>
   )
 }
