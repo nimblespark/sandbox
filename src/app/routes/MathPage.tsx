@@ -15,22 +15,22 @@ export function MathPage() {
   const [sum, setSum] = useState(0)
   const [nullHypothesis, setNullHypothesis] = useState(0.5)
   const [sampleProportion, setSampleProportion] = useState(0.3)
+  const [sampleSize, setSampleSize] = useState(10)
 
-  const sampleSize = 10
   const threshold = 0.05
   const simulationCount = 1000
 
   function generateNullGraph(nullHypothesis: number, sampleSize: number) {
     const data: Data[] = []
-    for (let i = 0; i < 11; i++) data.push({ percentage: i / 10, amount: 0 })
+    for (let i = 0; i < 101; i++) data.push({ percentage: i / 100, amount: 0 })
     for (let i = 0; i < simulationCount; i++) {
       var success = 0
       for (let i = 0; i < sampleSize; i++) {
         if (Math.random() < nullHypothesis) success++
       }
-      data[Math.round((success / sampleSize) * 10)] = {
-        ...data[Math.round((success / sampleSize) * 10)],
-        amount: data[Math.round((success / sampleSize) * 10)].amount + 1,
+      data[Math.round((success / sampleSize) * 100)] = {
+        ...data[Math.round((success / sampleSize) * 100)],
+        amount: data[Math.round((success / sampleSize) * 100)].amount + 1,
       }
     }
     console.log({ data })
@@ -62,12 +62,14 @@ export function MathPage() {
           dataset={dataset}
           xAxis={[{ scaleType: "band", dataKey: "percentage" }]}
           series={[{ dataKey: "amount" }]}
-          width={500}
+          width={800}
           height={300}
         />
         <div style={{ display: "flex", textAlign: "center" }}>
           <div style={{ margin: 20 }}>
-            <Typography fontSize={25}>{nullHypothesis}</Typography>
+            <Typography fontSize={25}>
+              {Math.round(nullHypothesis * 100)}%
+            </Typography>
             <Slider
               max={1}
               step={0.01}
@@ -77,7 +79,9 @@ export function MathPage() {
             Null Hypothesis
           </div>
           <div style={{ margin: 20 }}>
-            <Typography fontSize={25}>{sampleProportion}</Typography>
+            <Typography fontSize={25}>
+              {Math.round(sampleProportion * 100)}%
+            </Typography>
             <Slider
               max={1}
               step={0.01}
@@ -85,6 +89,17 @@ export function MathPage() {
               onChange={(_, value) => setSampleProportion(value as number)}
             />
             Sample proportion
+          </div>
+          <div style={{ margin: 20, width: 400 }}>
+            <Typography fontSize={25}>{sampleSize}</Typography>
+            <Slider
+              min={1}
+              max={10000}
+              step={1}
+              value={sampleSize}
+              onChange={(_, value) => setSampleSize(value as number)}
+            />
+            Sample size
           </div>
         </div>
         <div>
