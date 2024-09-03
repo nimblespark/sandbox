@@ -89,7 +89,6 @@ export function MathQuiz() {
         />
         <Quiz questions={[{ name: "p-value", correct: pValue }]} />
       </div>
-      {pValue}
     </BasicPage>
   )
 }
