@@ -17,6 +17,7 @@ import { useEffect, useRef, useState } from "react"
 import { AlphaTabApi, Settings } from "@coderline/alphatab"
 import { ProgressionPage } from "./app/routes/ProgressionPage"
 import { MathPage } from "./app/routes/MathPage"
+import { MathQuiz } from "./app/routes/MathQuiz"
 
 export function App() {
   // const elementRef = useRef<HTMLDivElement>(null)
@@ -97,6 +98,10 @@ export function App() {
       {
         path: "/math",
         element: <MathPage />,
+      },
+      {
+        path: "/quiz",
+        element: <MathQuiz />,
       },
     ]
     // { basename: window.location.pathname }

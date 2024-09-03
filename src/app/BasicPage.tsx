@@ -53,7 +53,14 @@ export function BasicPage(props: Props) {
           </Typography>
         </Toolbar>
       </AppBar>
-      <div style={{ flex: 1, display: "flex", overflow: "auto" }}>
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          overflow: "auto",
+          flexDirection: "column",
+        }}
+      >
         {props.children}
       </div>
       <Drawer

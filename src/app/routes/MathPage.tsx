@@ -3,11 +3,7 @@ import * as React from "react"
 import { BarChart } from "@mui/x-charts/BarChart"
 import { useEffect, useState } from "react"
 import { Button, Slider, Typography } from "@mui/material"
-
-type Data = {
-  percentage: number
-  amount: number
-}
+import { Data, generateNullGraph } from "../../math/Math"
 
 export function MathPage() {
   const [dataset, setDataset] = useState<Data[]>([])
@@ -26,23 +22,6 @@ export function MathPage() {
   const sampleProportion = successes / sampleSize
 
   const pValue = sum / simulationCount
-
-  function generateNullGraph(nullHypothesis: number, sampleSize: number) {
-    const data: Data[] = []
-    for (let i = 0; i < 101; i++) data.push({ percentage: i / 100, amount: 0 })
-    for (let i = 0; i < simulationCount; i++) {
-      var success = 0
-      for (let i = 0; i < sampleSize; i++) {
-        if (Math.random() < nullHypothesis) success++
-      }
-      data[Math.round((success / sampleSize) * 100)] = {
-        ...data[Math.round((success / sampleSize) * 100)],
-        amount: data[Math.round((success / sampleSize) * 100)].amount + 1,
-      }
-    }
-    console.log({ data })
-    setDataset(data)
-  }
 
   useEffect(() => {
     let s = 0
@@ -99,7 +78,7 @@ export function MathPage() {
               value={nullHypothesis}
               onChange={(_, value) => {
                 setNullHypothesis(value as number)
-                generateNullGraph(nullHypothesis, sampleSize)
+                generateNullGraph(simulationCount, nullHypothesis, sampleSize)
               }}
             />
             Null Hypothesis
@@ -113,7 +92,9 @@ export function MathPage() {
               step={1}
               value={sampleSize}
               onChange={(_, value) => {
-                generateNullGraph(nullHypothesis, sampleSize)
+                setDataset(
+                  generateNullGraph(simulationCount, nullHypothesis, sampleSize)
+                )
                 setSampleSize(value as number)
               }}
               onChangeCommitted={() => {
@@ -143,7 +124,13 @@ export function MathPage() {
         {pValue < threshold
           ? ` less than the threshold of ${threshold} and is therefore statistically significant`
           : ` more than the threshold of ${threshold} and is therefore NOT statistically significant`}
-        <Button onClick={() => generateNullGraph(nullHypothesis, sampleSize)}>
+        <Button
+          onClick={() =>
+            setDataset(
+              generateNullGraph(simulationCount, nullHypothesis, sampleSize)
+            )
+          }
+        >
           Generate
         </Button>
       </div>
