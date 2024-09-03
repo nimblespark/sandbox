@@ -4,37 +4,37 @@ import { AlphaTabApi, Settings } from "@coderline/alphatab"
 import { BasicPage } from "../BasicPage"
 import { Button, Select, Slider } from "@mui/material"
 import {
-  GuitarChord,
-  GuitarMusic,
+  diatonicSeventhsBasedOnRoot,
+  diatonicTriadsBasedOnRoot,
   Inversion,
+  Mode,
+  NamedChord,
   Note,
   note,
   Quality,
-  String,
-} from "./Music"
+  Scale,
+} from "./music/Music"
+import { GuitarChord, GuitarMusic, String } from "./music/Guitar"
 
 type Props = {
-  note: Note
-  inversion: Inversion
-  string: String | null
-  quality: Quality
+  chords: NamedChord[]
 }
 
 export function AlphaTab(props: Props) {
   const elementRef = useRef<HTMLDivElement>(null)
   const apiRef = useRef<AlphaTabApi | null>(null)
 
-  const string = props.string ?? undefined
+  // const string = props.string ?? undefined
 
-  const guitarMusic: GuitarMusic = {
-    key: { note: note("C") },
-    chords: GuitarChord.generate(
-      props.note,
-      props.quality,
-      string,
-      props.inversion
-    ),
-  }
+  // const guitarMusic: GuitarMusic = {
+  //   key: { note: note("C") },
+  //   chords: GuitarChord.generate(
+  //     props.note,
+  //     props.quality,
+  //     string,
+  //     props.inversion
+  //   ),
+  // }
 
   useEffect(() => {
     if (elementRef.current) {
@@ -58,6 +58,53 @@ export function AlphaTab(props: Props) {
       //       3.4 0.3 2.3 0.2 | 1.2 3.2 0.1 1.1 |
       //       3.1.1
       // `
+
+      let currentLowest = 0
+
+      const chords = diatonicSeventhsBasedOnRoot(
+        note("G"),
+        Scale.mode(Mode.Dorian)
+      )
+        .concat(
+          diatonicSeventhsBasedOnRoot(note("G"), Scale.mode(Mode.Dorian))[0]
+        )
+        .map((chord) => {
+          // return GuitarChord.generate(
+          //   chord.root,
+          //   chord.quality,
+          //   6,
+          //   Inversion.Root
+          // )[0]
+          const chosenChord = GuitarChord.generate(
+            chord.root,
+            chord.quality,
+            6,
+            Inversion.Root
+          ).find((chord) => chord.notes[0].fret > currentLowest)
+          console.log({ chosenChord })
+          currentLowest = chosenChord?.notes[0].fret ?? 0
+          return chosenChord!
+        })
+
+      const coolMusic = {
+        key: { note: note("C") },
+        chords: chords,
+      }
+
+      const newChords = props.chords.map(
+        (chord) =>
+          GuitarChord.generate(
+            chord.root,
+            chord.quality,
+            undefined,
+            Inversion.Root
+          )[0]
+      )
+
+      const guitarMusic = {
+        key: { note: note("C") },
+        chords: newChords,
+      }
 
       const tex = `
       \\tempo 120

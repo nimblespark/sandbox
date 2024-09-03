@@ -1,202 +1,7 @@
-const fretsCount = 14
-const lowestFret = 1
+import { Interval, Inversion, Mode, Note, note, Quality } from "./Music"
 
-type Letter = "A" | "B" | "C" | "D" | "E" | "F" | "G"
-const Letter = {
-  toNoteNumber(letter: Letter): NoteNumber {
-    switch (letter) {
-      case "C":
-        return 0
-      case "D":
-        return 2
-      case "E":
-        return 4
-      case "F":
-        return 5
-      case "G":
-        return 7
-      case "A":
-        return 9
-      case "B":
-        return 11
-    }
-  },
-}
-
-export enum Accidental {
-  Natural = 0,
-  Sharp = 1,
-  Flat = -1,
-  DoubleSharp = 2,
-  DoubleFlat = -2,
-}
-export namespace Accidental {
-  export function toDisplayString(accidental: Accidental) {
-    switch (accidental) {
-      case Accidental.Natural:
-        return ""
-      case Accidental.DoubleFlat:
-        return "bb"
-      case Accidental.Flat:
-        return "b"
-      case Accidental.Sharp:
-        return "#"
-      case Accidental.DoubleSharp:
-        return "##"
-    }
-  }
-}
-
-enum Interval {
-  unison = 0,
-  m2 = 1,
-  M2 = 2,
-  m3 = 3,
-  M3 = 4,
-  P4 = 5,
-  dim5 = 6,
-  P5 = 7,
-  m6 = 8,
-  M6 = 9,
-  m7 = 10,
-  M7 = 11,
-  octave = 12,
-}
-
-/** Distinct number representations of notes to easily calculate intervals */
-type NoteNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11
-const NoteNumber = {
-  increaseBy(number: number, noteNumber: NoteNumber): NoteNumber {
-    return Math.abs((noteNumber + number) % 12) as NoteNumber
-  },
-  toNote(number: NoteNumber): Note {
-    switch (number) {
-      case 0:
-        return note("C")
-      case 1:
-        return note("D", Accidental.Flat)
-      case 2:
-        return note("D")
-      case 3:
-        return note("E", Accidental.Flat)
-      case 4:
-        return note("E")
-      case 5:
-        return note("F")
-      case 6:
-        return note("G", Accidental.Flat)
-      case 7:
-        return note("G")
-      case 8:
-        return note("A", Accidental.Flat)
-      case 9:
-        return note("A")
-      case 10:
-        return note("B", Accidental.Flat)
-      case 11:
-        return note("B")
-    }
-  },
-}
-// console.log(NoteNumber.increaseBy(6, 11))
-
-export type Note = {
-  letter: Letter
-  accidental: Accidental
-}
-export const Note = {
-  toNoteNumber(note: Note): NoteNumber {
-    return NoteNumber.increaseBy(
-      note.accidental,
-      Letter.toNoteNumber(note.letter)
-    )
-  },
-  toDisplayString(note: Note): string {
-    return `${note.letter}${Accidental.toDisplayString(note.accidental)}`
-  },
-  transpose(interval: Interval, note: Note): Note {
-    return NoteNumber.toNote(
-      NoteNumber.increaseBy(interval, Note.toNoteNumber(note))
-    )
-  },
-}
-
-console.log(Note.toDisplayString(Note.transpose(Interval.m3, note("C"))))
-
-export function note(letter: Letter, accidental?: Accidental): Note {
-  return {
-    letter: letter,
-    accidental: accidental ? accidental : Accidental.Natural,
-  }
-}
-
-export enum Inversion {
-  Root = "Root",
-  First = "1st",
-  Second = "2nd",
-  Third = "3rd",
-}
-export namespace Inversion {
-  export function bassNote(inversion: Inversion, quality: Quality, root: Note) {
-    switch (inversion) {
-      case Inversion.Root:
-        return Note.transpose(Interval.unison, root)
-
-      case Inversion.First:
-        switch (quality) {
-          case Quality.Maj7:
-          case Quality.Dom7:
-            return Note.transpose(Interval.M3, root)
-          default:
-            return Note.transpose(Interval.m3, root)
-        }
-
-      case Inversion.Second:
-        switch (quality) {
-          case Quality.Half:
-          case Quality.Full:
-            return Note.transpose(Interval.dim5, root)
-          default:
-            return Note.transpose(Interval.P5, root)
-        }
-      case Inversion.Third:
-        switch (quality) {
-          case Quality.Maj7:
-            return Note.transpose(Interval.M7, root)
-          case Quality.Dom7:
-          case Quality.Min7:
-          case Quality.Half:
-            return Note.transpose(Interval.m7, root)
-          default:
-            return Note.transpose(Interval.M6, root)
-        }
-    }
-  }
-}
-
-export enum Quality {
-  Maj7 = "Maj7",
-  Dom7 = "Dom7",
-  Min7 = "Min7",
-  Half = "Half-Dim7",
-  Full = "Dim7",
-}
-export namespace Quality {
-  export function toLeadSheet(quality: Quality) {
-    switch (quality) {
-      case Quality.Maj7:
-        return "△7"
-      case Quality.Dom7:
-        return "7"
-      case Quality.Min7:
-        return "m7"
-      case Quality.Half:
-        return "ø7"
-      case Quality.Full:
-        return "°7"
-    }
-  }
-}
+const fretsCount = 24
+const lowestFret = 0
 
 export type String = 1 | 2 | 3 | 4 | 5 | 6
 export namespace String {
@@ -216,29 +21,6 @@ export namespace String {
         return note("E")
     }
   }
-}
-
-enum Mode {
-  Ionian = 1,
-  Dorian,
-  Phrygian,
-  Lydian,
-  Mixolydian,
-  Aeloian,
-  Locrian,
-}
-
-type Triad = {
-  1: Note
-  2: Note
-  3: Note
-}
-
-type Seventh = {
-  1: Note
-  2: Note
-  3: Note
-  4: Note
 }
 
 type GuitarNote = {
@@ -268,16 +50,6 @@ console.log(GuitarNote.onString(2, note("B")).map((note) => note.fret))
 
 function g(string: String, fret: number): GuitarNote {
   return { string, fret }
-}
-
-type Key = {
-  note: Note
-  mode: Mode
-}
-const Key = {
-  toTex(key: Key): string {
-    return ``
-  },
 }
 
 /** Generates a chord pattern based on string, inversion, and quality */
@@ -369,7 +141,7 @@ const ChordPattern = {
               case Inversion.First:
                 return [g(5, 0), g(4, 1), g(3, -2), g(2, 1)]
               case Inversion.Second:
-                return [g(5, 0), g(4, 0), g(3, -1), g(2, 2)]
+                return [g(5, 0), g(4, 0), g(3, -1), g(2, 1)]
               case Inversion.Third:
                 return [g(5, 0), g(4, 1), g(3, -1), g(2, 0)]
             }
@@ -475,8 +247,6 @@ export const GuitarChord = {
       )
   },
 }
-
-type Chord = Note[]
 
 export type GuitarMusic = {
   key: { note: Note; mode?: Mode }

@@ -15,6 +15,8 @@ import { MusicPage } from "./app/routes/MusicPage"
 import { AlphaTab } from "./app/routes/AlphaTab"
 import { useEffect, useRef, useState } from "react"
 import { AlphaTabApi, Settings } from "@coderline/alphatab"
+import { ProgressionPage } from "./app/routes/ProgressionPage"
+import { MathPage } from "./app/routes/MathPage"
 
 export function App() {
   // const elementRef = useRef<HTMLDivElement>(null)
@@ -91,6 +93,11 @@ export function App() {
       //   path: "/alpha:chord",
       //   element: <AlphaTab />,
       // },
+      { path: "/progression", element: <ProgressionPage /> },
+      {
+        path: "/math",
+        element: <MathPage />,
+      },
     ]
     // { basename: window.location.pathname }
   )

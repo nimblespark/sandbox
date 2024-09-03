@@ -1,4 +1,5 @@
 import {
+  Calculate,
   Checklist,
   Home,
   Menu,
@@ -98,11 +99,17 @@ export function BasicPage(props: Props) {
             </ListItemIcon>
             <ListItemText>Chord Generator</ListItemText>
           </ListItemButton>
-          <ListItemButton component={Link} to="/alpha">
+          <ListItemButton component={Link} to="/progression">
             <ListItemIcon>
               <MusicNoteTwoTone />
             </ListItemIcon>
-            <ListItemText>Alpha</ListItemText>
+            <ListItemText>Progression</ListItemText>
+          </ListItemButton>
+          <ListItemButton component={Link} to="/math">
+            <ListItemIcon>
+              <Calculate />
+            </ListItemIcon>
+            <ListItemText>Math</ListItemText>
           </ListItemButton>
         </List>
       </Drawer>

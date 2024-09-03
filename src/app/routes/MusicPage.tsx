@@ -56,10 +56,11 @@ const defaultQualities = [
 
 import React from "react"
 import { maxHeight } from "@mui/system"
-import { Accidental, Inversion, note, Note, Quality } from "./Music"
+import { Accidental, Inversion, note, Note, Quality } from "./music/Music"
 import { AlphaTab } from "./AlphaTab"
 import { Close } from "@mui/icons-material"
 import { useViewport } from "../../useViewport"
+import { GuitarChord, GuitarMusic } from "./music/Guitar"
 
 const styles = {
   container: {
@@ -160,6 +161,16 @@ export function MusicPage() {
           : 5
         : null,
     })
+  }
+
+  const guitarMusic: GuitarMusic | null = chord && {
+    key: { note: note("C") },
+    chords: GuitarChord.generate(
+      chord.note,
+      chord.quality,
+      chord.string ?? undefined,
+      chord.inversion
+    ),
   }
 
   return (
