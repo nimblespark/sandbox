@@ -1,7 +1,7 @@
 import { BasicPage } from "../BasicPage"
 import * as React from "react"
 import { BarChart } from "@mui/x-charts/BarChart"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button, Slider, Typography } from "@mui/material"
 
 type Data = {
@@ -11,14 +11,21 @@ type Data = {
 
 export function MathPage() {
   const [dataset, setDataset] = useState<Data[]>([])
-  const [pValue, setPValue] = useState<number>(0)
+
   const [sum, setSum] = useState(0)
   const [nullHypothesis, setNullHypothesis] = useState(0.5)
-  const [sampleProportion, setSampleProportion] = useState(0.3)
+
   const [sampleSize, setSampleSize] = useState(10)
+  const [successes, setSuccesses] = useState(0)
+
+  const maxSampleSize = 1000
 
   const threshold = 0.05
   const simulationCount = 1000
+
+  const sampleProportion = successes / sampleSize
+
+  const pValue = sum / simulationCount
 
   function generateNullGraph(nullHypothesis: number, sampleSize: number) {
     const data: Data[] = []
@@ -35,17 +42,20 @@ export function MathPage() {
     }
     console.log({ data })
     setDataset(data)
-    let sum = 0
-    data
+  }
+
+  useEffect(() => {
+    let s = 0
+    dataset
       .filter((item) =>
         sampleProportion > nullHypothesis
           ? item.percentage >= sampleProportion
           : item.percentage <= sampleProportion
       )
-      .forEach((data) => (sum += data.amount))
-    setPValue(sum / simulationCount)
-    setSum(sum)
-  }
+      .forEach((data) => (s += data.amount))
+
+    setSum(s)
+  }, [sampleProportion, nullHypothesis, dataset])
 
   return (
     <BasicPage title="Math">
@@ -60,7 +70,20 @@ export function MathPage() {
       >
         <BarChart
           dataset={dataset}
-          xAxis={[{ scaleType: "band", dataKey: "percentage" }]}
+          xAxis={[
+            {
+              scaleType: "band",
+              dataKey: "percentage",
+              colorMap: {
+                type: "piecewise",
+                thresholds:
+                  sampleProportion > nullHypothesis
+                    ? [0, sampleProportion]
+                    : [sampleProportion],
+                colors: ["red", "blue", "red"],
+              },
+            },
+          ]}
           series={[{ dataKey: "amount" }]}
           width={800}
           height={300}
@@ -74,37 +97,45 @@ export function MathPage() {
               max={1}
               step={0.01}
               value={nullHypothesis}
-              onChange={(_, value) => setNullHypothesis(value as number)}
+              onChange={(_, value) => {
+                setNullHypothesis(value as number)
+                generateNullGraph(nullHypothesis, sampleSize)
+              }}
             />
             Null Hypothesis
           </div>
-          <div style={{ margin: 20 }}>
-            <Typography fontSize={25}>
-              {Math.round(sampleProportion * 100)}%
-            </Typography>
-            <Slider
-              max={1}
-              step={0.01}
-              value={sampleProportion}
-              onChange={(_, value) => setSampleProportion(value as number)}
-            />
-            Sample proportion
-          </div>
+
           <div style={{ margin: 20, width: 400 }}>
             <Typography fontSize={25}>{sampleSize}</Typography>
             <Slider
               min={1}
-              max={10000}
+              max={maxSampleSize}
               step={1}
               value={sampleSize}
-              onChange={(_, value) => setSampleSize(value as number)}
+              onChange={(_, value) => {
+                generateNullGraph(nullHypothesis, sampleSize)
+                setSampleSize(value as number)
+              }}
+              onChangeCommitted={() => {
+                if (successes > sampleSize) setSuccesses(sampleSize)
+              }}
             />
             Sample size
+            <div style={{ width: (sampleSize / maxSampleSize) * 400 }}>
+              <Typography fontSize={25}>{successes}</Typography>
+              <Slider
+                max={sampleSize}
+                step={1}
+                value={successes}
+                onChange={(_, value) => setSuccesses(value as number)}
+              />
+              Successes
+            </div>
           </div>
         </div>
         <div>
           Out of the {simulationCount} simulations run, {sum} ended with a
-          sample proportion of {sampleProportion} or{" "}
+          sample proportion of {Math.round(sampleProportion * 1000) / 10}% or{" "}
           {sampleProportion > nullHypothesis ? "higher" : "lower"}
         </div>
         <div>P-value is {pValue} </div>

@@ -76,25 +76,65 @@ export namespace Accidental {
 }
 
 export enum Interval {
-  unison = 0,
-  m2 = 1,
-  M2 = 2,
-  m3 = 3,
-  M3 = 4,
-  P4 = 5,
-  aug4 = 6,
-  dim5 = 6,
-  P5 = 7,
-  m6 = 8,
-  M6 = 9,
-  dim7 = 9,
-  m7 = 10,
-  M7 = 11,
-  octave = 12,
-  step = 2,
-  halfStep = 1,
+  unison,
+  m2,
+  M2,
+  m3,
+  M3,
+  P4,
+  aug4,
+  dim5,
+  P5,
+  m6,
+  M6,
+  dim7,
+  m7,
+  M7,
+  octave,
+  step,
+  halfStep,
 }
 export namespace Interval {
+  export function halfSteps(interval: Interval | number): number {
+    switch (interval) {
+      case Interval.unison:
+        return 0
+      case Interval.m2:
+        return 1
+      case Interval.M2:
+        return 2
+      case Interval.m3:
+        return 3
+      case Interval.M3:
+        return 4
+      case Interval.P4:
+        return 5
+      case Interval.aug4:
+        return 6
+      case Interval.dim5:
+        return 6
+      case Interval.P5:
+        return 7
+      case Interval.m6:
+        return 8
+      case Interval.M6:
+        return 9
+      case Interval.dim7:
+        return 9
+      case Interval.m7:
+        return 10
+      case Interval.M7:
+        return 11
+      case Interval.octave:
+        return 12
+      case Interval.halfStep:
+        return 1
+      case Interval.step:
+        return 2
+      default:
+        return interval
+    }
+  }
   export function shiftAmount(interval: Interval): number {
     switch (interval) {
       case Interval.unison:
@@ -127,6 +167,8 @@ export namespace Interval {
         return 6
       case Interval.octave:
         return 7
+      default:
+        return 0
     }
   }
 }
