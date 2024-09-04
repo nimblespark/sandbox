@@ -58,7 +58,7 @@ export function MathPage() {
                 thresholds:
                   sampleProportion > nullHypothesis
                     ? [0, sampleProportion]
-                    : [sampleProportion],
+                    : [sampleProportion + 0.0000001],
                 colors: ["red", "blue", "red"],
               },
             },
