@@ -79,6 +79,7 @@ export enum Interval {
   unison,
   m2,
   M2,
+  aug2,
   m3,
   M3,
   P4,
@@ -103,6 +104,8 @@ export namespace Interval {
         return 1
       case Interval.M2:
         return 2
+      case Interval.aug2:
+        return 3
       case Interval.m3:
         return 3
       case Interval.M3:
@@ -143,6 +146,8 @@ export namespace Interval {
         return 1
       case Interval.M2:
         return 1
+      case Interval.aug2:
+        return 1
       case Interval.m3:
         return 2
       case Interval.M3:
@@ -167,6 +172,10 @@ export namespace Interval {
         return 6
       case Interval.octave:
         return 7
+      case Interval.halfStep:
+        return 1
+      case Interval.step:
+        return 1
       default:
         return 0
     }
@@ -210,6 +219,8 @@ export const NoteNumber = {
 }
 // console.log(NoteNumber.increaseBy(6, 11))
 
+const octaves = [0, 1, 2, 3, 4, 5, 6]
+
 export type Note = {
   letter: Letter
   accidental: Accidental
@@ -222,29 +233,61 @@ export const Note = {
     )
   },
 
+  interval(note1: Note, note2: Note): Interval {
+    var letterDifference = 1
+    var currentLetter = note1.letter
+    while (currentLetter !== note2.letter) {
+      currentLetter = Letter.next(currentLetter)
+      letterDifference++
+    }
+    Note.toNoteNumber(note2) - Note.toNoteNumber(note1)
+
+    return Interval.M2
+  },
+
   toDisplayString(note: Note): string {
     return `${note.letter}${Accidental.toDisplayString(note.accidental)}`
   },
   transpose(interval: Interval, n: Note): Note {
     const letter = Letter.shift(Interval.shiftAmount(interval), n.letter)
-    console.log("letter", letter)
+
     const accidentental =
-      NoteNumber.increaseBy(interval, Note.toNoteNumber(n)) -
-      Note.toNoteNumber(note(letter))
+      NoteNumber.increaseBy(
+        Interval.halfSteps(interval),
+        Note.toNoteNumber(n)
+      ) - Note.toNoteNumber(note(letter))
 
     return note(letter, accidentental)
   },
+  toMidiNumber(note: Note, octave: number) {
+    return Note.toNoteNumber(note) + 12 + octave * 12
+  },
+  toMidiNumbersForAllOctaves(note: Note): number[] {
+    return octaves.map((octave) => Note.toMidiNumber(note, octave))
+  },
+  fromMidiNumber(midiNum: number) {
+    return NoteNumber.toNote((midiNum % 12) as NoteNumber)
+  },
 }
 
-console.log(
-  "interval",
-  Note.toDisplayString(Note.transpose(Interval.aug4, note("C")))
-)
+console.log("Testing MIDI ", Note.toMidiNumber(note("C"), 4))
+
+console.log("interval", Note.transpose(Interval.aug2, note("C")))
 
 export function note(letter: Letter, accidental?: Accidental): Note {
   return {
     letter: letter,
     accidental: accidental ? accidental : Accidental.Natural,
+  }
+}
+
+export type OctavedNote = { note: Note; octave: number }
+export namespace OctavedNote {
+  export function fromMidiNumber(midiNumber: number): OctavedNote {
+    return {
+      note: NoteNumber.toNote((midiNumber % 12) as NoteNumber),
+      octave: midiNumber / 12,
+    }
   }
 }
 
@@ -352,14 +395,22 @@ export namespace Scale {
     Interval.halfStep,
   ]
 
+  export const HarmonicMinor: Scale = [
+    Interval.step,
+    Interval.halfStep,
+    Interval.step,
+    Interval.step,
+    Interval.halfStep,
+    Interval.aug2,
+    Interval.halfStep,
+  ]
+
   export const MinorScale = mode(Mode.Aeloian)
 
   export function mode(mode: Mode): Scale {
     return rotateBy(mode, MajorScale)
   }
 }
-
-console.log(Scale.mode(Mode.Aeloian))
 
 type Triad = [Interval, Interval]
 type Seventh = [Interval, Interval, Interval]
@@ -445,11 +496,8 @@ const ChordStructure = {
 
 function diatonicTriad(scaleDegree: ScaleDegree, scale: Scale): Triad {
   const mode = rotateBy(scaleDegree - 1, scale)
-  console.log("mode: ", scaleDegree, ",", mode)
   return [mode[0] + mode[1], mode[2] + mode[3]]
 }
-
-console.log("diatonic triad", diatonicTriad(2, Scale.MajorScale))
 
 function diatonicSeventh(scaleDegree: ScaleDegree, scale: Scale): Seventh {
   const mode = rotateBy(scaleDegree - 1, scale)
@@ -465,8 +513,6 @@ function allDiatonicSevenths(scale: Scale): Seventh[] {
   return scale.map((_, i) => diatonicSeventh((i + 1) as ScaleDegree, scale))
 }
 
-console.log(allDiatonicTriads(Scale.MajorScale))
-
 console.log(
   allDiatonicSevenths(Scale.mode(Mode.Mixolydian)).map((chord) =>
     ChordStructure.toQuality(chord)
@@ -481,6 +527,17 @@ export const NamedChord = {
   toLeadSheet(chord: NamedChord): string {
     return Note.toDisplayString(chord.root) + Quality.toLeadSheet(chord.quality)
   },
+}
+
+export function diatonicNotesBasedOnRoot(root: Note, scale: Scale): Note[] {
+  var currentNote = root
+  return [
+    root,
+    ...scale.map((interval) => {
+      currentNote = Note.transpose(interval, currentNote)
+      return currentNote
+    }),
+  ]
 }
 
 export function diatonicTriadsBasedOnRoot(

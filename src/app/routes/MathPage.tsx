@@ -17,7 +17,7 @@ export function MathPage() {
   const maxSampleSize = 1000
 
   const threshold = 0.05
-  const simulationCount = 1000
+  const simulationCount = 10000
 
   const sampleProportion = successes / sampleSize
 

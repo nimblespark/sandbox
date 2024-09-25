@@ -1,37 +1,37 @@
 import { BarChart } from "@mui/x-charts"
 import { BasicPage } from "../BasicPage"
 import { asPercentage, generateNullGraph } from "../../math/Math"
-import { ReactElement, useEffect, useState } from "react"
-import { Button, TextField, Typography } from "@mui/material"
-import {
-  Controller,
-  ControllerFieldState,
-  ControllerRenderProps,
-  FieldValues,
-  useForm,
-  UseFormStateReturn,
-} from "react-hook-form"
-import { FileDownload } from "@mui/icons-material"
+
+import { Typography } from "@mui/material"
 import { Quiz } from "../../math/Quiz"
 
-type FormData = {
-  pValue: number
-}
-
 export function MathQuiz() {
-  const [correct, setCorrect] = useState<boolean | null>(null)
-
   const nouns = [
     "people",
     "birds",
     "stuffed animals",
     "clouds",
     "girls named Vivian",
+    "clowns",
   ]
 
-  const adjectives = ["hairy", "alive", "white", "just straight ugly"]
+  const adjectives = [
+    "hairy",
+    "white",
+    "just straight ugly",
+    "edible",
+    "downright evil",
+    "mentally insane",
+  ]
 
-  const places = ["inside your bathroom", "to the park", "to Mexico"]
+  const places = [
+    "inside your bathroom",
+    "to the park",
+    "to Mexico",
+    "to hell",
+    "to a Trump rally",
+    "to highschool prom",
+  ]
 
   const noun = nouns[Math.floor(Math.random() * nouns.length)]
   const adjective = adjectives[Math.floor(Math.random() * adjectives.length)]
@@ -42,8 +42,13 @@ export function MathQuiz() {
   const successes = Math.round(Math.random() * sampleSize)
 
   const sampleProportion = successes / sampleSize
-  const nullHypothesis =
-    Math.round(((Math.random() - 0.5) / 10 + sampleProportion) * 100) / 100
+  const nullHypothesis = Math.min(
+    100,
+    Math.max(
+      0,
+      Math.round(((Math.random() - 0.5) / 10 + sampleProportion) * 100) / 100
+    )
+  )
 
   const dataset = generateNullGraph(1000, nullHypothesis, sampleSize)
 
@@ -73,14 +78,14 @@ export function MathQuiz() {
             {
               scaleType: "band",
               dataKey: "percentage",
-              colorMap: {
-                type: "piecewise",
-                thresholds:
-                  sampleProportion > nullHypothesis
-                    ? [0, sampleProportion]
-                    : [sampleProportion + 0.0000001],
-                colors: ["red", "blue", "red"],
-              },
+              // colorMap: {
+              //   type: "piecewise",
+              //   thresholds:
+              //     sampleProportion > nullHypothesis
+              //       ? [0, sampleProportion]
+              //       : [sampleProportion + 0.0000001],
+              //   colors: ["red", "blue", "red"],
+              // },
             },
           ]}
           series={[{ dataKey: "amount" }]}
@@ -89,11 +94,15 @@ export function MathQuiz() {
         />
         <Quiz
           questions={[
-            { name: "p-value", correct: pValue },
             {
               name: "sample proportion",
               correct: Math.round(sampleProportion * 100) / 100,
             },
+            {
+              name: "null value",
+              correct: Math.round(nullHypothesis * 100) / 100,
+            },
+            { name: "p-value", correct: pValue },
           ]}
         />
       </div>

@@ -1,0 +1,19 @@
+.ReactPiano__Key--highlighted {
+  background: rgb(235, 201, 87);  /* Change the default active key color to bright red */
+}
+
+.ReactPiano__Key--accidental {
+  background: black;
+}
+
+.ReactPiano__Key--highlighted.ReactPiano__Key--accidental {
+  background: rgb(114, 97, 3);  /* Change the default active key color to bright red */
+}
+
+.ReactPiano__Key--active {
+  background: rgb(249, 3, 7);
+}
+
+.ReactPiano__Key--active.ReactPiano__Key--highlighted {
+  background: rgb(124, 181, 211);
+}

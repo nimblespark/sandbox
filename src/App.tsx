@@ -18,6 +18,7 @@ import { AlphaTabApi, Settings } from "@coderline/alphatab"
 import { ProgressionPage } from "./app/routes/ProgressionPage"
 import { MathPage } from "./app/routes/MathPage"
 import { MathQuiz } from "./app/routes/MathQuiz"
+import { PianoPage } from "./app/routes/PianoPage"
 
 export function App() {
   // const elementRef = useRef<HTMLDivElement>(null)
@@ -102,6 +103,10 @@ export function App() {
       {
         path: "/quiz",
         element: <MathQuiz />,
+      },
+      {
+        path: "/piano",
+        element: <PianoPage />,
       },
     ]
     // { basename: window.location.pathname }
