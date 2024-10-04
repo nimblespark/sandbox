@@ -1,17 +1,19 @@
-import { Piano, KeyboardShortcuts, MidiNumbers } from "../../my-react-piano"
+import { Piano, KeyboardShortcuts } from "../../my-react-piano"
 import "react-piano/dist/styles.css"
 import "./music/customPianoStyles.css"
-import { SplendidGrandPiano, Reverb } from "smplr"
+import { SplendidGrandPiano } from "smplr"
 import {
-  Accidental,
   diatonicNotesBasedOnRoot,
-  Note,
-  note,
-  NoteNumber,
+  FullChord,
+  fullChordAndKeyToRomanNumeral,
+  octavedNotesToChord,
+  RomanNumeral,
   Scale,
 } from "./music/Music"
 import { useEffect, useState } from "react"
 import { Button, MenuItem, Select } from "@mui/material"
+import { Note, NoteNumber, OctavedNote } from "./music/MusicBasics"
+import { RomanNumeralComponent } from "./music/RomanNumeralComponent"
 
 const context = new AudioContext()
 const piano = new SplendidGrandPiano(context)
@@ -40,6 +42,84 @@ export function PianoPage() {
   const [scale, setScale] = useState<Scale | null>(null)
   const [activeMidiNotes, setActiveMidiNotes] = useState<number[]>([])
 
+  const sortedOctavedNotes = activeMidiNotes.sort()
+
+  const flatNotes = sortedOctavedNotes.map(OctavedNote.fromMidiNumber)
+
+  const sharpNotes = sortedOctavedNotes.map(OctavedNote.fromMidiNumberSharp)
+
+  const flatChord = octavedNotesToChord(flatNotes)
+
+  const sharpChord = octavedNotesToChord(sharpNotes)
+
+  const finalChord = flatChord ? flatChord : sharpChord
+
+  const chordName = finalChord && FullChord.toLeadSheet(finalChord)
+
+  const romanNumeral =
+    (finalChord &&
+      root &&
+      scale &&
+      RomanNumeral.toDisplayString(
+        fullChordAndKeyToRomanNumeral(finalChord, { note: root, scale: scale })
+      )) ??
+    ""
+
+  // const bassNote =
+  //   currentOctavedNotes.length > 0 ? currentOctavedNotes[0] : null
+
+  // var simplifiedOctavedNotes: OctavedNote[] = bassNote ? [bassNote] : []
+
+  // currentOctavedNotes.forEach((potential) => {
+  //   // if this is a unique note, add it to the simplified list in it's lowest position that's still above the bass
+  //   if (
+  //     !simplifiedOctavedNotes.some(
+  //       (element) =>
+  //         Note.toNoteNumber(element.note) === Note.toNoteNumber(potential.note)
+  //     )
+  //   ) {
+  //     var noteToAdd = potential
+  //     while (
+  //       bassNote &&
+  //       OctavedNote.toMidiNumber(potential) >
+  //         OctavedNote.toMidiNumber(bassNote) + 11
+  //     ) {
+  //       noteToAdd.octave--
+  //     }
+  //     simplifiedOctavedNotes.push(noteToAdd)
+  //     console.log({ simplifiedOctavedNotes })
+  //   }
+  // })
+
+  // simplifiedOctavedNotes.sort(
+  //   (a, b) => OctavedNote.toMidiNumber(a) - OctavedNote.toMidiNumber(b)
+  // )
+
+  // console.log("Finished notes", simplifiedOctavedNotes)
+
+  // const currentChordAndRoot = convertIntervalsToThirds(
+  //   intervalsFromNotes(simplifiedOctavedNotes)
+  // )
+  // const chordQuality =
+  //   currentChordAndRoot &&
+  //   ChordStructure.toQuality(currentChordAndRoot.intervals)
+  // const chordName = chordQuality
+  //   ? `${NamedChord.toLeadSheet({
+  //       root: simplifiedOctavedNotes[currentChordAndRoot.rootNum].note,
+  //       quality: chordQuality,
+  //     })} ${
+  //       bassNote &&
+  //       bassNote.note !== currentOctavedNotes[currentChordAndRoot.rootNum].note
+  //         ? ` / ${Note.toDisplayString(bassNote.note)}`
+  //         : ""
+  //     }`
+  //   : ""
+
+  // console.log({ currentOctavedNotes })
+  // console.log({ currentChordAndRoot })
+  // console.log({ chordQuality })
+  // console.log({ chordName })
+
   const diatonicNotes =
     root &&
     scale &&
@@ -48,32 +128,36 @@ export function PianoPage() {
     )
 
   function handleInputMessage(event: MIDIMessageEvent) {
+    // console.log("Midi input")
     if (event.data) {
       const note = event.data[1]
       const velocity = event.data[2]
-      console.log(note, velocity)
+      // console.log(note, velocity)
       if (velocity === 0) {
         setActiveMidiNotes((currentNotes) =>
           currentNotes.filter((activeNote) => activeNote !== note)
         )
       } else {
-        setActiveMidiNotes((currentNotes) => [...currentNotes, note])
+        setActiveMidiNotes((currentNotes) => [
+          ...new Set([...currentNotes, note]),
+        ])
       }
     }
   }
-  console.log({ activeMidiNotes })
+  //console.log({ activeMidiNotes })
 
   useEffect(() => {
     // declare the data fetching function
     const fetchData = async () => {
       const data = await navigator.requestMIDIAccess()
+      // console.log("inputs size", data.inputs.size)
       const keys = data.inputs
       keys.forEach((input) => {
-        console.log("INPUT", input)
+        // console.log("INPUT", input)
         input.onmidimessage = handleInputMessage
       })
 
-      console.log("MIDI inputs", data.inputs.entries())
+      //console.log("MIDI inputs", data.inputs.entries())
     }
 
     // call the function
@@ -89,11 +173,17 @@ export function PianoPage() {
           noteRange={{ first: firstNote, last: lastNote }}
           playNote={(midiNumber: number) => {
             piano.start(midiNumber)
+            setActiveMidiNotes((currentNotes) => [
+              ...new Set([...currentNotes, midiNumber]),
+            ])
             if (!root)
               setRoot(NoteNumber.toNote((midiNumber % 12) as NoteNumber))
           }}
           stopNote={(midiNumber: number) => {
             piano.stop(midiNumber)
+            setActiveMidiNotes((currentNotes) =>
+              currentNotes.filter((activeNote) => activeNote !== midiNumber)
+            )
           }}
           width={1000}
           highlightedNotes={
@@ -135,6 +225,8 @@ export function PianoPage() {
           Restart
         </Button>
       )}
+      <div style={{ fontSize: 200 }}>{chordName}</div>
+      <RomanNumeralComponent romanNumeral={romanNumeral} />
     </>
   )
 }

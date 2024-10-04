@@ -20,7 +20,7 @@ export function generateNullGraph(
       amount: data[Math.round((success / sampleSize) * 100)].amount + 1,
     }
   }
-  console.log({ data })
+  //console.log({ data })
   return data
 }
 

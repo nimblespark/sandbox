@@ -9,12 +9,11 @@ import {
   Inversion,
   Mode,
   NamedChord,
-  Note,
-  note,
   Quality,
   Scale,
 } from "./music/Music"
 import { GuitarChord, GuitarMusic, String } from "./music/Guitar"
+import { note } from "./music/MusicBasics"
 
 type Props = {
   chords: NamedChord[]
@@ -81,7 +80,7 @@ export function AlphaTab(props: Props) {
             6,
             Inversion.Root
           ).find((chord) => chord.notes[0].fret > currentLowest)
-          console.log({ chosenChord })
+          // console.log({ chosenChord })
           currentLowest = chosenChord?.notes[0].fret ?? 0
           return chosenChord!
         })

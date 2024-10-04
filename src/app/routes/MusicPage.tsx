@@ -56,11 +56,12 @@ const defaultQualities = [
 
 import React from "react"
 import { maxHeight } from "@mui/system"
-import { Accidental, Inversion, note, Note, Quality } from "./music/Music"
+import { Inversion, Quality } from "./music/Music"
 import { AlphaTab } from "./AlphaTab"
 import { Close } from "@mui/icons-material"
 import { useViewport } from "../../useViewport"
 import { GuitarChord, GuitarMusic } from "./music/Guitar"
+import { Accidental, note, Note } from "./music/MusicBasics"
 
 const styles = {
   container: {

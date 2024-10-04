@@ -1,336 +1,25 @@
 import { rotateBy } from "../../helpers"
+import { Interval, interval } from "./Interval"
+import { Note, OctavedNote } from "./MusicBasics"
 
-type Letter = "A" | "B" | "C" | "D" | "E" | "F" | "G"
-const Letter = {
-  toNoteNumber(letter: Letter): NoteNumber {
-    switch (letter) {
-      case "C":
-        return 0
-      case "D":
-        return 2
-      case "E":
-        return 4
-      case "F":
-        return 5
-      case "G":
-        return 7
-      case "A":
-        return 9
-      case "B":
-        return 11
-    }
-  },
-  next(letter: Letter): Letter {
-    switch (letter) {
-      case "C":
-        return "D"
-      case "D":
-        return "E"
-      case "E":
-        return "F"
-      case "F":
-        return "G"
-      case "G":
-        return "A"
-      case "A":
-        return "B"
-      case "B":
-        return "C"
-    }
-  },
-
-  shift(number: number, letter: Letter): Letter {
-    switch (number) {
-      case 0:
-        return letter
-      default:
-        return this.shift(number - 1, this.next(letter))
-    }
-  },
-}
-
-console.log(Letter.shift(5, "A"))
-
-export enum Accidental {
-  Natural = 0,
-  Sharp = 1,
-  Flat = -1,
-  DoubleSharp = 2,
-  DoubleFlat = -2,
-}
-export namespace Accidental {
-  export function toDisplayString(accidental: Accidental) {
-    switch (accidental) {
-      case Accidental.Natural:
-        return ""
-      case Accidental.DoubleFlat:
-        return "bb"
-      case Accidental.Flat:
-        return "b"
-      case Accidental.Sharp:
-        return "#"
-      case Accidental.DoubleSharp:
-        return "##"
-    }
-  }
-}
-
-export enum Interval {
-  unison,
-  m2,
-  M2,
-  aug2,
-  m3,
-  M3,
-  P4,
-  aug4,
-  dim5,
-  P5,
-  m6,
-  M6,
-  dim7,
-  m7,
-  M7,
-  octave,
-  step,
-  halfStep,
-}
-export namespace Interval {
-  export function halfSteps(interval: Interval | number): number {
-    switch (interval) {
-      case Interval.unison:
-        return 0
-      case Interval.m2:
-        return 1
-      case Interval.M2:
-        return 2
-      case Interval.aug2:
-        return 3
-      case Interval.m3:
-        return 3
-      case Interval.M3:
-        return 4
-      case Interval.P4:
-        return 5
-      case Interval.aug4:
-        return 6
-      case Interval.dim5:
-        return 6
-      case Interval.P5:
-        return 7
-      case Interval.m6:
-        return 8
-      case Interval.M6:
-        return 9
-      case Interval.dim7:
-        return 9
-      case Interval.m7:
-        return 10
-      case Interval.M7:
-        return 11
-      case Interval.octave:
-        return 12
-      case Interval.halfStep:
-        return 1
-      case Interval.step:
-        return 2
-      default:
-        return interval
-    }
-  }
-  export function shiftAmount(interval: Interval): number {
-    switch (interval) {
-      case Interval.unison:
-        return 0
-      case Interval.m2:
-        return 1
-      case Interval.M2:
-        return 1
-      case Interval.aug2:
-        return 1
-      case Interval.m3:
-        return 2
-      case Interval.M3:
-        return 2
-      case Interval.P4:
-        return 3
-      case Interval.aug4:
-        return 3
-      case Interval.dim5:
-        return 4
-      case Interval.P5:
-        return 4
-      case Interval.m6:
-        return 5
-      case Interval.M6:
-        return 5
-      case Interval.dim7:
-        return 6
-      case Interval.m7:
-        return 6
-      case Interval.M7:
-        return 6
-      case Interval.octave:
-        return 7
-      case Interval.halfStep:
-        return 1
-      case Interval.step:
-        return 1
-      default:
-        return 0
-    }
-  }
-}
-
-/** Distinct number representations of notes to easily calculate intervals */
-export type NoteNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11
-export const NoteNumber = {
-  increaseBy(number: number, noteNumber: NoteNumber): NoteNumber {
-    return Math.abs((noteNumber + number) % 12) as NoteNumber
-  },
-  toNote(number: NoteNumber): Note {
-    switch (number) {
-      case 0:
-        return note("C")
-      case 1:
-        return note("D", Accidental.Flat)
-      case 2:
-        return note("D")
-      case 3:
-        return note("E", Accidental.Flat)
-      case 4:
-        return note("E")
-      case 5:
-        return note("F")
-      case 6:
-        return note("G", Accidental.Flat)
-      case 7:
-        return note("G")
-      case 8:
-        return note("A", Accidental.Flat)
-      case 9:
-        return note("A")
-      case 10:
-        return note("B", Accidental.Flat)
-      case 11:
-        return note("B")
-    }
-  },
-}
-// console.log(NoteNumber.increaseBy(6, 11))
-
-const octaves = [0, 1, 2, 3, 4, 5, 6]
-
-export type Note = {
-  letter: Letter
-  accidental: Accidental
-}
-export const Note = {
-  toNoteNumber(note: Note): NoteNumber {
-    return NoteNumber.increaseBy(
-      note.accidental,
-      Letter.toNoteNumber(note.letter)
-    )
-  },
-
-  interval(note1: Note, note2: Note): Interval {
-    var letterDifference = 1
-    var currentLetter = note1.letter
-    while (currentLetter !== note2.letter) {
-      currentLetter = Letter.next(currentLetter)
-      letterDifference++
-    }
-    Note.toNoteNumber(note2) - Note.toNoteNumber(note1)
-
-    return Interval.M2
-  },
-
-  toDisplayString(note: Note): string {
-    return `${note.letter}${Accidental.toDisplayString(note.accidental)}`
-  },
-  transpose(interval: Interval, n: Note): Note {
-    const letter = Letter.shift(Interval.shiftAmount(interval), n.letter)
-
-    const accidentental =
-      NoteNumber.increaseBy(
-        Interval.halfSteps(interval),
-        Note.toNoteNumber(n)
-      ) - Note.toNoteNumber(note(letter))
-
-    return note(letter, accidentental)
-  },
-  toMidiNumber(note: Note, octave: number) {
-    return Note.toNoteNumber(note) + 12 + octave * 12
-  },
-  toMidiNumbersForAllOctaves(note: Note): number[] {
-    return octaves.map((octave) => Note.toMidiNumber(note, octave))
-  },
-  fromMidiNumber(midiNum: number) {
-    return NoteNumber.toNote((midiNum % 12) as NoteNumber)
-  },
-}
-
-console.log("Testing MIDI ", Note.toMidiNumber(note("C"), 4))
-
-console.log("interval", Note.transpose(Interval.aug2, note("C")))
-
-export function note(letter: Letter, accidental?: Accidental): Note {
-  return {
-    letter: letter,
-    accidental: accidental ? accidental : Accidental.Natural,
-  }
-}
-
-export type OctavedNote = { note: Note; octave: number }
-export namespace OctavedNote {
-  export function fromMidiNumber(midiNumber: number): OctavedNote {
-    return {
-      note: NoteNumber.toNote((midiNumber % 12) as NoteNumber),
-      octave: midiNumber / 12,
-    }
-  }
-}
-
+type ChordTone = 1 | 3 | 5 | 7
 export enum Inversion {
-  Root = "Root",
-  First = "1st",
-  Second = "2nd",
-  Third = "3rd",
+  Root,
+  First,
+  Second,
+  Third,
 }
 export namespace Inversion {
-  export function bassNote(inversion: Inversion, quality: Quality, root: Note) {
+  export function toN(inversion: Inversion): ChordTone {
     switch (inversion) {
       case Inversion.Root:
-        return Note.transpose(Interval.unison, root)
-
+        return 1
       case Inversion.First:
-        switch (quality) {
-          case Quality.Maj7:
-          case Quality.Dom7:
-            return Note.transpose(Interval.M3, root)
-          default:
-            return Note.transpose(Interval.m3, root)
-        }
-
+        return 3
       case Inversion.Second:
-        switch (quality) {
-          case Quality.Half:
-          case Quality.Full:
-            return Note.transpose(Interval.dim5, root)
-          default:
-            return Note.transpose(Interval.P5, root)
-        }
+        return 5
       case Inversion.Third:
-        switch (quality) {
-          case Quality.Maj7:
-            return Note.transpose(Interval.M7, root)
-          case Quality.Dom7:
-          case Quality.Min7:
-          case Quality.Half:
-            return Note.transpose(Interval.m7, root)
-          default:
-            return Note.transpose(Interval.M6, root)
-        }
+        return 7
     }
   }
 }
@@ -369,6 +58,38 @@ export namespace Quality {
         return "+"
     }
   }
+  export function isMajor(quality: Quality): boolean {
+    return Interval.name(Quality.toIntervals(quality)[0]) === "M3"
+  }
+  export function isMinor(quality: Quality): boolean {
+    return Interval.name(Quality.toIntervals(quality)[0]) === "m3"
+  }
+  export function isSeventh(quality: Quality): boolean {
+    return Quality.toIntervals(quality).length === 3
+  }
+
+  export function toIntervals(quality: Quality): Interval[] {
+    switch (quality) {
+      case Quality.Maj7:
+        return [interval("M3"), interval("m3"), interval("M3")] as Seventh
+      case Quality.Dom7:
+        return [interval("M3"), interval("m3"), interval("m3")] as Seventh
+      case Quality.Min7:
+        return [interval("m3"), interval("M3"), interval("m3")] as Seventh
+      case Quality.Half:
+        return [interval("m3"), interval("m3"), interval("m3")] as Seventh
+      case Quality.Full:
+        return [interval("m3"), interval("m3"), interval("dim3")] as Seventh
+      case Quality.Maj:
+        return [interval("M3"), interval("m3")] as Triad
+      case Quality.Min:
+        return [interval("m3"), interval("M3")] as Triad
+      case Quality.Dim:
+        return [interval("m3"), interval("m3")] as Triad
+      case Quality.Aug:
+        return [interval("M3"), interval("M3")] as Triad
+    }
+  }
 }
 
 export enum Mode {
@@ -386,23 +107,23 @@ type ScaleDegree = 1 | 2 | 3 | 4 | 5 | 6 | 7
 export type Scale = Interval[]
 export namespace Scale {
   export const MajorScale: Scale = [
-    Interval.step,
-    Interval.step,
-    Interval.halfStep,
-    Interval.step,
-    Interval.step,
-    Interval.step,
-    Interval.halfStep,
+    interval("M2"),
+    interval("M2"),
+    interval("m2"),
+    interval("M2"),
+    interval("M2"),
+    interval("M2"),
+    interval("m2"),
   ]
 
   export const HarmonicMinor: Scale = [
-    Interval.step,
-    Interval.halfStep,
-    Interval.step,
-    Interval.step,
-    Interval.halfStep,
-    Interval.aug2,
-    Interval.halfStep,
+    interval("M2"),
+    interval("m2"),
+    interval("M2"),
+    interval("M2"),
+    interval("m2"),
+    interval("aug2"),
+    interval("m2"),
   ]
 
   export const MinorScale = mode(Mode.Aeloian)
@@ -410,38 +131,48 @@ export namespace Scale {
   export function mode(mode: Mode): Scale {
     return rotateBy(mode, MajorScale)
   }
+
+  export function toDisplayString(scale: Scale) {
+    var output = ""
+    scale.forEach((interval) => (output += Interval.name(interval) + " "))
+    return output
+  }
 }
 
-type Triad = [Interval, Interval]
-type Seventh = [Interval, Interval, Interval]
+type Triad = [Interval.Third, Interval.Third]
+type Shell = [Interval.Third, Interval.Fifth]
+type Seventh = [Interval.Third, Interval.Third, Interval.Third]
 
-type ChordStructure = Triad | Seventh | Interval[]
-const ChordStructure = {
+export type ChordStructure = Triad | Seventh | Shell | Interval[]
+export const ChordStructure = {
   isTriad(chord: ChordStructure): chord is Triad {
     return chord.length === 2
   },
   isSeventh(chord: ChordStructure): chord is Seventh {
     return chord.length === 3
   },
+  isShell(chord: ChordStructure): chord is Shell {
+    return chord.length === 2 && chord[0].n === 3 && chord[1].n === 5
+  },
 
   toQuality(chord: ChordStructure): Quality | null {
     // If chord it's seventh chord
     if (this.isSeventh(chord)) {
-      switch (chord[0]) {
-        case Interval.m3:
-          switch (chord[1]) {
-            case Interval.m3:
-              switch (chord[2]) {
-                case Interval.m3:
+      switch (Interval.name(chord[0])) {
+        case "m3":
+          switch (Interval.name(chord[1])) {
+            case "m3":
+              switch (Interval.name(chord[2])) {
+                case "m3":
                   return Quality.Full
-                case Interval.M3:
+                case "M3":
                   return Quality.Half
                 default:
                   return null
               }
-            case Interval.M3:
-              switch (chord[2]) {
-                case Interval.m3:
+            case "M3":
+              switch (Interval.name(chord[2])) {
+                case "m3":
                   return Quality.Min7
                 default:
                   return null
@@ -449,13 +180,13 @@ const ChordStructure = {
             default:
               return null
           }
-        case Interval.M3:
-          switch (chord[1]) {
-            case Interval.m3:
-              switch (chord[2]) {
-                case Interval.m3:
+        case "M3":
+          switch (Interval.name(chord[1])) {
+            case "m3":
+              switch (Interval.name(chord[2])) {
+                case "m3":
                   return Quality.Dom7
-                case Interval.M3:
+                case "M3":
                   return Quality.Maj7
                 default:
                   return null
@@ -468,21 +199,21 @@ const ChordStructure = {
       }
     } else if (this.isTriad(chord)) {
       // If it's a triad
-      switch (chord[0]) {
-        case Interval.m3:
-          switch (chord[1]) {
-            case Interval.m3:
+      switch (Interval.name(chord[0])) {
+        case "m3":
+          switch (Interval.name(chord[1])) {
+            case "m3":
               return Quality.Dim
-            case Interval.M3:
+            case "M3":
               return Quality.Min
             default:
               return null
           }
-        case Interval.M3:
-          switch (chord[1]) {
-            case Interval.m3:
+        case "M3":
+          switch (Interval.name(chord[1])) {
+            case "m3":
               return Quality.Maj
-            case Interval.M3:
+            case "M3":
               return Quality.Aug
             default:
               return null
@@ -492,16 +223,57 @@ const ChordStructure = {
       }
     } else return null
   },
+  nextInversion(chord: ChordStructure): ChordStructure {
+    const remainingIntervals = chord.slice(1, chord.length)
+
+    const newInterval = Interval.subtract(
+      Interval.invert(chord[0]),
+      Interval.add(chord.slice(1, chord.length))
+    )
+    console.log("interval to add on top", newInterval)
+
+    console.log({ remainingIntervals })
+    return [...remainingIntervals, newInterval]
+  },
+
+  applyInversion(inversion: Inversion, chord: ChordStructure): Interval[] {
+    var chordToReturn = chord
+
+    for (let i = 0; i < inversion; i++) {
+      chordToReturn = this.nextInversion(chordToReturn)
+    }
+    return chordToReturn
+  },
 }
+
+console.log(
+  "Apply inversion",
+  ChordStructure.applyInversion(Inversion.Second, [
+    interval("M3"),
+    interval("m3"),
+  ])
+)
+
+console.log(
+  "TESTING shell",
+  ChordStructure.isShell([interval("m3"), interval("p5")])
+)
 
 function diatonicTriad(scaleDegree: ScaleDegree, scale: Scale): Triad {
   const mode = rotateBy(scaleDegree - 1, scale)
-  return [mode[0] + mode[1], mode[2] + mode[3]]
+  return [
+    Interval.add2(mode[0], mode[1]),
+    Interval.add2(mode[2], mode[3]),
+  ] as Triad
 }
 
 function diatonicSeventh(scaleDegree: ScaleDegree, scale: Scale): Seventh {
   const mode = rotateBy(scaleDegree - 1, scale)
-  return [mode[0] + mode[1], mode[2] + mode[3], mode[4] + mode[5]]
+  return [
+    Interval.add2(mode[0], mode[1]),
+    Interval.add2(mode[2], mode[3]),
+    Interval.add2(mode[4], mode[5]),
+  ] as Seventh
 }
 
 /** Returns all triads in a scale */
@@ -513,11 +285,11 @@ function allDiatonicSevenths(scale: Scale): Seventh[] {
   return scale.map((_, i) => diatonicSeventh((i + 1) as ScaleDegree, scale))
 }
 
-console.log(
-  allDiatonicSevenths(Scale.mode(Mode.Mixolydian)).map((chord) =>
-    ChordStructure.toQuality(chord)
-  )
-)
+// console.log(
+//   allDiatonicSevenths(Scale.mode(Mode.Mixolydian)).map((chord) =>
+//     ChordStructure.toQuality(chord)
+//   )
+// )
 
 export type NamedChord = {
   root: Note
@@ -551,7 +323,10 @@ export function diatonicTriadsBasedOnRoot(
         root: Note.transpose(
           scale
             .slice(0, i)
-            .reduce<number>((partialSum, a) => partialSum + a, 0),
+            .reduce<Interval>(
+              (partialSum, a) => Interval.add2(partialSum, a),
+              Interval.unison
+            ),
           root
         ),
         quality: ChordStructure.toQuality(triad)!,
@@ -570,7 +345,10 @@ export function diatonicSeventhsBasedOnRoot(
         root: Note.transpose(
           scale
             .slice(0, i)
-            .reduce<number>((partialSum, a) => partialSum + a, 0),
+            .reduce<Interval>(
+              (partialSum, a) => Interval.add2(partialSum, a),
+              Interval.unison
+            ),
           root
         ),
         quality: ChordStructure.toQuality(seventh)!,
@@ -578,16 +356,28 @@ export function diatonicSeventhsBasedOnRoot(
     })
 }
 
-console.log(
-  "HALLELUJAH ",
-  diatonicTriadsBasedOnRoot(note("C"), Scale.MajorScale).map((chord) =>
-    NamedChord.toLeadSheet(chord)
-  ),
-  "DOUBLE HALLELUJAH",
-  diatonicSeventhsBasedOnRoot(note("C"), Scale.MajorScale).map((chord) =>
-    NamedChord.toLeadSheet(chord)
-  )
-)
+export function intervalFromScaleAndDegree(
+  scale: Scale,
+  degree: ScaleDegree
+): Interval {
+  const intervals = scale.slice(0, degree - 1)
+  // console.log(Scale.toDisplayString(intervals))
+  return Interval.add(intervals)
+}
+//console.log(Scale.toDisplayString(Scale.MajorScale))
+
+//console.log(Interval.name(intervalFromScaleAndDegree(Scale.MajorScale, 2)))
+
+// console.log(
+//   "HALLELUJAH ",
+//   diatonicTriadsBasedOnRoot(note("C"), Scale.MajorScale).map((chord) =>
+//     NamedChord.toLeadSheet(chord)
+//   ),
+//   "DOUBLE HALLELUJAH",
+//   diatonicSeventhsBasedOnRoot(note("C"), Scale.MajorScale).map((chord) =>
+//     NamedChord.toLeadSheet(chord)
+//   )
+// )
 
 type Key = {
   note: Note
@@ -597,4 +387,355 @@ const Key = {
   toTex(key: Key): string {
     return ``
   },
+}
+
+/**
+ * Will convert any music concept to a string
+ * @returns
+ */
+export function musicPrint(n: any): string {
+  return ""
+}
+
+export function intervalsFromNotes(notes: OctavedNote[]): Interval[] {
+  if (notes.length < 2) return []
+  const currentIntervals = []
+  for (let i = 0; i < notes.length - 1; i++) {
+    currentIntervals.push(OctavedNote.interval(notes[i], notes[i + 1]))
+  }
+  return currentIntervals
+}
+
+/**
+ * Must take a root position shell chord (3rd followed by 5th)
+ * @param intervals
+ */
+function rootPositionShellToSeventh(intervals: Shell): Seventh {
+  const firstInterval = intervals[0]
+  const fifth = Interval.subtract(
+    interval("p5"),
+    intervals[0]
+  ) as Interval.Third
+  const seventh = Interval.subtract(intervals[1], fifth) as Interval.Third
+
+  return [firstInterval, fifth, seventh]
+}
+console.log(
+  "TESTING SHELL",
+  Scale.toDisplayString(
+    rootPositionShellToSeventh([
+      { n: 3, offset: 0 },
+      { n: 5, offset: 0 },
+    ])
+  )
+)
+export function convertIntervalsToThirds(
+  intervals: Interval[]
+): { intervals: Interval[]; inversion: Inversion; rootNum: number } | null {
+  if (intervals.every((interval) => interval.n == 3))
+    return { intervals: intervals, inversion: Inversion.Root, rootNum: 0 }
+
+  if (ChordStructure.isShell(intervals))
+    return {
+      intervals: rootPositionShellToSeventh(intervals),
+      inversion: Inversion.Root,
+      rootNum: 0,
+    }
+
+  var newIntervalList = intervals
+
+  for (let i = 0; i < intervals.length; i++) {
+    // console.log(i, Scale.toDisplayString(newIntervalList))
+    console.log("inverted", Interval.invert(newIntervalList[0]))
+    const newInterval = Interval.subtract(
+      Interval.invert(newIntervalList[0]),
+      Interval.add(newIntervalList.slice(1, newIntervalList.length))
+    )
+    console.log("interval to add on top", newInterval)
+    const remainingIntervals = newIntervalList.slice(1, intervals.length)
+    console.log({ remainingIntervals })
+    newIntervalList = [
+      ...newIntervalList.slice(1, intervals.length),
+      newInterval,
+    ]
+
+    const isSeventh = ChordStructure.isSeventh(newIntervalList)
+
+    const isShell = ChordStructure.isShell(newIntervalList)
+
+    const rootNum = i + 1
+
+    const inversion =
+      rootNum === 0
+        ? Inversion.Root
+        : isSeventh
+        ? 4 - rootNum
+        : isShell
+        ? rootNum === 1
+          ? 3
+          : 1
+        : 3 - rootNum
+
+    if (newIntervalList.every((interval) => interval.n == 3))
+      return {
+        intervals: newIntervalList,
+        inversion: inversion,
+        rootNum: rootNum,
+      }
+
+    if (ChordStructure.isShell(newIntervalList)) {
+      return {
+        intervals: rootPositionShellToSeventh(newIntervalList),
+        inversion: inversion,
+        rootNum: rootNum,
+      }
+    }
+  }
+
+  return null
+}
+
+type FullChord = {
+  chord: NamedChord
+  inversion: Inversion
+}
+export namespace FullChord {
+  export function toLeadSheet(fullChord: FullChord) {
+    return `${NamedChord.toLeadSheet(fullChord.chord)}
+      ${
+        fullChord.inversion > 0
+          ? `/
+      ${Note.toDisplayString(FullChord.bassNote(fullChord))}`
+          : ""
+      }`
+  }
+
+  enum Voice {
+    Bass,
+    Tenor,
+    Alto,
+    Soprano,
+  }
+
+  export function voice(voice: Voice, { chord, inversion }: FullChord): Note {
+    const root = chord.root
+
+    const intervals = Quality.toIntervals(chord.quality)
+
+    const invertedChord = ChordStructure.applyInversion(inversion, intervals)
+
+    var sum: Interval[] = []
+    for (let i = 0; i < inversion; i++) {
+      sum.push(intervals[i])
+      console.log("Is this undefined", intervals[i])
+    }
+
+    const bassNote = Note.transpose(Interval.add(sum), root)
+
+    var intervalsToAdd = []
+    for (let i = 0; i < voice; i++) {
+      intervalsToAdd.push(invertedChord[i])
+    }
+
+    return Note.transpose(Interval.add(intervalsToAdd), bassNote)
+  }
+
+  export function bassNote(fullChord: FullChord): Note {
+    return voice(Voice.Bass, fullChord)
+  }
+
+  // export function bassNote({ inversion, chord }: FullChord): Note {
+  //   const quality = chord.quality
+  //   const root = chord.root
+  //   console.log({ root })
+  //   console.log({ inversion })
+  //   switch (inversion) {
+  //     case Inversion.Root:
+  //       return Note.transpose(Interval.unison, root)
+
+  //     case Inversion.First:
+  //       switch (quality) {
+  //         case Quality.Maj7:
+  //         case Quality.Dom7:
+  //           return Note.transpose(interval("M3"), root)
+  //         default:
+  //           return Note.transpose(interval("m3"), root)
+  //       }
+
+  //     case Inversion.Second:
+  //       switch (quality) {
+  //         case Quality.Half:
+  //         case Quality.Full:
+  //           return Note.transpose(interval("dim5"), root)
+  //         default:
+  //           return Note.transpose(interval("p5"), root)
+  //       }
+  //     case Inversion.Third:
+  //       switch (quality) {
+  //         case Quality.Maj7:
+  //           return Note.transpose(interval("M7"), root)
+  //         case Quality.Dom7:
+  //         case Quality.Min7:
+  //         case Quality.Half:
+  //           return Note.transpose(interval("m7"), root)
+  //         default:
+  //           return Note.transpose(interval("dim7"), root)
+  //       }
+  //   }
+  // }
+}
+
+//console.log("XXXX ", convertIntervalsToThirds(MajorTriad))
+
+//console.log("subtrackt", Interval.subtract(interval("p5"), interval("M3")))
+
+export function octavedNotesToChord(
+  currentOctavedNotes: OctavedNote[]
+): FullChord | null {
+  const bassNote =
+    currentOctavedNotes.length > 0 ? currentOctavedNotes[0] : null
+
+  var simplifiedOctavedNotes: OctavedNote[] = bassNote ? [bassNote] : []
+
+  currentOctavedNotes.forEach((potential) => {
+    // if this is a unique note, add it to the simplified list in it's lowest position that's still above the bass
+    if (
+      !simplifiedOctavedNotes.some(
+        (element) =>
+          Note.toNoteNumber(element.note) === Note.toNoteNumber(potential.note)
+      )
+    ) {
+      var noteToAdd = potential
+      while (
+        bassNote &&
+        OctavedNote.toMidiNumber(potential) >
+          OctavedNote.toMidiNumber(bassNote) + 11
+      ) {
+        noteToAdd.octave--
+      }
+      simplifiedOctavedNotes.push(noteToAdd)
+      console.log({ simplifiedOctavedNotes })
+    }
+  })
+
+  simplifiedOctavedNotes.sort(
+    (a, b) => OctavedNote.toMidiNumber(a) - OctavedNote.toMidiNumber(b)
+  )
+
+  console.log("Finished notes", simplifiedOctavedNotes)
+
+  const currentChordAndRoot = convertIntervalsToThirds(
+    intervalsFromNotes(simplifiedOctavedNotes)
+  )
+  const chordQuality =
+    currentChordAndRoot &&
+    ChordStructure.toQuality(currentChordAndRoot.intervals)
+
+  const namedChord = currentChordAndRoot &&
+    simplifiedOctavedNotes[currentChordAndRoot.rootNum] && {
+      root: simplifiedOctavedNotes[currentChordAndRoot.rootNum].note,
+      quality: chordQuality,
+    }
+
+  return (
+    namedChord &&
+    namedChord.quality && {
+      chord: { root: namedChord.root, quality: namedChord.quality },
+      inversion: currentChordAndRoot.inversion,
+    }
+  )
+}
+
+export function fullChordAndKeyToRomanNumeral(
+  fullChord: FullChord,
+  key: Key
+): RomanNumeral {
+  const interval = Note.interval(key.note, fullChord.chord.root)
+  return {
+    interval: interval,
+    quality: fullChord.chord.quality,
+    inversion: fullChord.inversion,
+  }
+}
+
+type RomanNumeral = {
+  interval: Interval
+  quality: Quality
+  inversion: Inversion
+}
+
+export namespace RomanNumeral {
+  export function toDisplayString(roman: RomanNumeral) {
+    if (roman.interval.n < 1 || roman.interval.n > 7)
+      throw new Error(
+        `Interval has to be a possible scale degree but was ${Interval.name(
+          roman.interval
+        )}`
+      )
+    const isMajor = Quality.isMajor(roman.quality)
+    const isSeventh = Quality.isSeventh(roman.quality)
+    var n: string
+    switch (roman.interval.n) {
+      case 1:
+        n = isMajor ? "I" : "i"
+        break
+      case 2:
+        n = isMajor ? "II" : "ii"
+        break
+      case 3:
+        n = isMajor ? "III" : "iii"
+        break
+      case 4:
+        n = isMajor ? "IV" : "iv"
+        break
+      case 5:
+        n = isMajor ? "V" : "v"
+        break
+      case 6:
+        n = isMajor ? "VI" : "vi"
+        break
+      case 7:
+        n = isMajor ? "VII" : "vii"
+        break
+      default:
+        throw new Error()
+    }
+
+    if (roman.quality === Quality.Full || roman.quality === Quality.Dim)
+      n += "°"
+    else if (roman.quality === Quality.Half) n += "ø"
+    var suffix: string
+
+    if (isSeventh) {
+      switch (roman.inversion) {
+        case Inversion.Root:
+          suffix = "7"
+          break
+        case Inversion.First:
+          suffix = "65"
+          break
+        case Inversion.Second:
+          suffix = "43"
+          break
+        case Inversion.Third:
+          suffix = "2"
+          break
+      }
+    } else {
+      switch (roman.inversion) {
+        case Inversion.Root:
+          suffix = ""
+          break
+        case Inversion.First:
+          suffix = "6"
+          break
+        case Inversion.Second:
+          suffix = "64"
+          break
+        default:
+          throw new Error("Can't have a third inversion on a triad")
+      }
+    }
+    return n + suffix
+  }
 }

@@ -7,19 +7,12 @@ import {
   RadioGroup,
 } from "@mui/material"
 import { BasicPage } from "../BasicPage"
-import {
-  Accidental,
-  Inversion,
-  NamedChord,
-  note,
-  Note,
-  NoteNumber,
-  Quality,
-} from "./music/Music"
+import { Inversion, NamedChord, Quality } from "./music/Music"
 import { useState } from "react"
 import { useViewport } from "../../useViewport"
 import { Close, Delete } from "@mui/icons-material"
 import { AlphaTab } from "./AlphaTab"
+import { Accidental, note, Note, NoteNumber } from "./music/MusicBasics"
 
 const notes: Note[] = [
   note("C"),

@@ -1,4 +1,6 @@
-import { Interval, Inversion, Mode, Note, note, Quality } from "./Music"
+import { Interval } from "./Interval"
+import { FullChord, Inversion, Mode, Quality } from "./Music"
+import { Note, note } from "./MusicBasics"
 
 const fretsCount = 24
 const lowestFret = 0
@@ -35,18 +37,18 @@ const GuitarNote = {
   onString(string: String, note: Note): GuitarNote[] {
     let currentNote: number = Note.toNoteNumber(note)
     let fret = currentNote - Note.toNoteNumber(String.firstNote(string))
-    console.log(fret)
+    //  console.log(fret)
     const listOfFrets = []
     while (fret <= fretsCount) {
       if (fret >= lowestFret) listOfFrets.push(fret)
-      currentNote += Interval.octave
+      currentNote += Interval.halfSteps(Interval.octave)
       fret = currentNote - Note.toNoteNumber(String.firstNote(string))
     }
     return listOfFrets.map((f) => ({ string: string, fret: f }))
   },
 }
 
-console.log(GuitarNote.onString(2, note("B")).map((note) => note.fret))
+//console.log(GuitarNote.onString(2, note("B")).map((note) => note.fret))
 
 function g(string: String, fret: number): GuitarNote {
   return { string, fret }
@@ -204,7 +206,10 @@ export const GuitarChord = {
       : [Inversion.Root, Inversion.First, Inversion.Second, Inversion.Third]
 
     for (const inversion of inversions) {
-      const bassNote = Inversion.bassNote(inversion, quality, root)
+      const bassNote = FullChord.bassNote({
+        inversion: inversion,
+        chord: { root: root, quality: quality },
+      })
       const bassList = string
         ? GuitarNote.onString(string, bassNote)
         : GuitarNote.onString(6, bassNote).concat(

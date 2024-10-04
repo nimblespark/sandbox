@@ -11,14 +11,14 @@ export function Quiz({ questions }: Props) {
   const { control, handleSubmit } = useForm()
   const [correct, setCorrect] = useState<boolean | null>(null)
 
-  console.log(
-    "default values",
-    questions.reduce((a, v) => ({ ...a, [v.name]: 0 }), {})
-  )
+  // console.log(
+  //   "default values",
+  //   questions.reduce((a, v) => ({ ...a, [v.name]: 0 }), {})
+  // )
 
   function _handleSubmit(data: Record<string, number>) {
-    console.log({ questions })
-    console.log({ data })
+    // console.log({ questions })
+    // console.log({ data })
     setCorrect(
       questions.every(
         (question) => Number(data[question.name]) === question.correct
