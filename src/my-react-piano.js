@@ -309,6 +309,12 @@ function (_React$Component) {
       _this.props.onPlayNoteInput(_this.props.midiNumber);
     });
 
+    _defineProperty(_assertThisInitialized(_this), "onHover", function () {
+      _this.props.onHover(_this.props.midiNumber);
+    });
+
+
+
     _defineProperty(_assertThisInitialized(_this), "onStopNoteInput", function () {
       _this.props.onStopNoteInput(_this.props.midiNumber);
     });
@@ -359,13 +365,14 @@ function (_React$Component) {
           'ReactPiano__Key--active': active,
           'ReactPiano__Key--highlighted': highlighted
         }),
+        id: midiNumber,
         style: {
           left: ratioToPercentage(this.getRelativeKeyPosition(midiNumber) * naturalKeyWidth),
           width: ratioToPercentage(accidental ? accidentalWidthRatio * naturalKeyWidth : naturalKeyWidth)
         },
         onMouseDown: useTouchEvents ? null : this.onPlayNoteInput,
         onMouseUp: useTouchEvents ? null : this.onStopNoteInput,
-        onMouseEnter: gliss ? this.onPlayNoteInput : null,
+        onMouseEnter: gliss ? this.onPlayNoteInput : this.onHover,
         onMouseLeave: this.onStopNoteInput,
         onTouchStart: useTouchEvents ? this.onPlayNoteInput : null,
         onTouchCancel: useTouchEvents ? this.onStopNoteInput : null,
@@ -390,6 +397,7 @@ _defineProperty(Key, "propTypes", {
   highlighted: PropTypes.bool.isRequired,
   disabled: PropTypes.bool.isRequired,
   onPlayNoteInput: PropTypes.func.isRequired,
+  onHover: PropTypes.func.isRequired,
   onStopNoteInput: PropTypes.func.isRequired,
   accidentalWidthRatio: PropTypes.number.isRequired,
   pitchPositions: PropTypes.object.isRequired,
@@ -495,6 +503,7 @@ function (_React$Component) {
           accidental: isAccidental,
           disabled: _this.props.disabled,
           onPlayNoteInput: _this.props.onPlayNoteInput,
+          onHover: _this.props.onHover,
           onStopNoteInput: _this.props.onStopNoteInput,
           gliss: _this.props.gliss,
           useTouchEvents: _this.props.useTouchEvents,
@@ -516,6 +525,7 @@ _defineProperty(Keyboard, "propTypes", {
   activeNotes: PropTypes.arrayOf(PropTypes.number),
   highlightedNotes: PropTypes.arrayOf(PropTypes.number),
   onPlayNoteInput: PropTypes.func.isRequired,
+  onHover: PropTypes.func.isRequired,
   onStopNoteInput: PropTypes.func.isRequired,
   renderNoteLabel: PropTypes.func.isRequired,
   keyWidthToHeight: PropTypes.number.isRequired,
@@ -661,6 +671,15 @@ function (_React$Component) {
       _this.props.onPlayNoteInput(midiNumber, _this.props.activeNotes);
     });
 
+    _defineProperty(_assertThisInitialized(_this), "onHover", function (midiNumber) {
+      if (_this.props.disabled) {
+        return;
+      } // Pass in previous activeNotes for recording functionality
+
+
+      _this.props.onHover(midiNumber);
+    });
+
     _defineProperty(_assertThisInitialized(_this), "onStopNoteInput", function (midiNumber) {
       if (_this.props.disabled) {
         return;
@@ -745,6 +764,7 @@ function (_React$Component) {
       }, React.createElement(Keyboard, {
         noteRange: this.props.noteRange,
         onPlayNoteInput: this.onPlayNoteInput,
+        onHover: this.onHover,
         onStopNoteInput: this.onStopNoteInput,
         activeNotes: this.props.activeNotes,
         highlightedNotes: this.props.highlightedNotes,
@@ -769,6 +789,7 @@ _defineProperty(ControlledPiano, "propTypes", {
   playNote: PropTypes.func.isRequired,
   stopNote: PropTypes.func.isRequired,
   onPlayNoteInput: PropTypes.func.isRequired,
+  onHover: PropTypes.func.isRequired,
   onStopNoteInput: PropTypes.func.isRequired,
   renderNoteLabel: PropTypes.func.isRequired,
   className: PropTypes.string,
@@ -844,6 +865,10 @@ function (_React$Component) {
       });
     });
 
+    _defineProperty(_assertThisInitialized(_this), "onHover", function (midiNumber) {
+      
+    });
+
     _defineProperty(_assertThisInitialized(_this), "handleStopNoteInput", function (midiNumber) {
       _this.setState(function (prevState) {
         // Need to be handled inside setState in order to set prevActiveNotes without
@@ -889,12 +914,14 @@ function (_React$Component) {
           activeNotes = _this$props.activeNotes,
           highlightedNotes = _this$props.highlightedNotes,
           onPlayNoteInput = _this$props.onPlayNoteInput,
+          onHover = _this$props.onHover,
           onStopNoteInput = _this$props.onStopNoteInput,
           otherProps = _objectWithoutProperties(_this$props, ["activeNotes", "onPlayNoteInput", "onStopNoteInput"]);
 
       return React.createElement(ControlledPiano, _extends({
         activeNotes: this.state.activeNotes,
         onPlayNoteInput: this.handlePlayNoteInput,
+        onHover: this.onHover,
         onStopNoteInput: this.handleStopNoteInput
       }, otherProps));
     }
@@ -910,6 +937,7 @@ _defineProperty(Piano, "propTypes", {
   playNote: PropTypes.func.isRequired,
   stopNote: PropTypes.func.isRequired,
   onPlayNoteInput: PropTypes.func,
+  onHover: PropTypes.func,
   onStopNoteInput: PropTypes.func,
   renderNoteLabel: PropTypes.func,
   className: PropTypes.string,

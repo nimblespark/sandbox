@@ -7,6 +7,12 @@ export namespace Interval {
   export type Fifth = { n: 5; offset: number }
   export const unison = { n: 1, offset: 0 }
   export const octave = { n: 8, offset: 0 }
+  export function random(maxN: number = 8): Interval {
+    return {
+      n: Math.floor(Math.random() * (maxN - 1) + 1),
+      offset: Math.floor(Math.random() * 3) - 1,
+    }
+  }
   export function halfSteps(interval: Interval): number {
     const o = interval.offset
     switch (interval.n) {

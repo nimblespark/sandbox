@@ -12,8 +12,11 @@ import {
 } from "./music/Music"
 import { useEffect, useState } from "react"
 import { Button, MenuItem, Select } from "@mui/material"
-import { Note, NoteNumber, OctavedNote } from "./music/MusicBasics"
+import { note, Note, NoteNumber, OctavedNote } from "./music/MusicBasics"
 import { RomanNumeralComponent } from "./music/RomanNumeralComponent"
+import Xarrow from "react-xarrows"
+import { Interval } from "./music/Interval"
+import { Check, Close } from "@mui/icons-material"
 
 const context = new AudioContext()
 const piano = new SplendidGrandPiano(context)
@@ -41,6 +44,16 @@ export function PianoPage() {
   const [root, setRoot] = useState<Note | null>(null)
   const [scale, setScale] = useState<Scale | null>(null)
   const [activeMidiNotes, setActiveMidiNotes] = useState<number[]>([])
+  const [startNote, setStartNote] = useState<number | null>(null)
+  const [endNote, setEndNote] = useState<number | null>(null)
+  const [step, setStep] = useState<number>(1)
+  const [highlightedNotes, setHighlightedNotes] = useState<number[]>([])
+  const [randomNote, setRandomNote] = useState<Note>(note("C"))
+  const [randomInterval, setRandomInterval] = useState<Interval>(
+    Interval.unison
+  )
+  const [correctCount, setCorrectCount] = useState(0)
+  const [count, setCount] = useState(0)
 
   const sortedOctavedNotes = activeMidiNotes.sort()
 
@@ -65,60 +78,40 @@ export function PianoPage() {
       )) ??
     ""
 
-  // const bassNote =
-  //   currentOctavedNotes.length > 0 ? currentOctavedNotes[0] : null
+  const interval =
+    startNote &&
+    endNote &&
+    OctavedNote.interval(
+      OctavedNote.fromMidiNumber(startNote),
+      OctavedNote.fromMidiNumber(endNote)
+    )
 
-  // var simplifiedOctavedNotes: OctavedNote[] = bassNote ? [bassNote] : []
+  const correctNote: boolean = startNote
+    ? Note.toNoteNumber(randomNote) ===
+      Note.toNoteNumber(Note.fromMidiNumber(startNote))
+    : false
 
-  // currentOctavedNotes.forEach((potential) => {
-  //   // if this is a unique note, add it to the simplified list in it's lowest position that's still above the bass
-  //   if (
-  //     !simplifiedOctavedNotes.some(
-  //       (element) =>
-  //         Note.toNoteNumber(element.note) === Note.toNoteNumber(potential.note)
-  //     )
-  //   ) {
-  //     var noteToAdd = potential
-  //     while (
-  //       bassNote &&
-  //       OctavedNote.toMidiNumber(potential) >
-  //         OctavedNote.toMidiNumber(bassNote) + 11
-  //     ) {
-  //       noteToAdd.octave--
-  //     }
-  //     simplifiedOctavedNotes.push(noteToAdd)
-  //     console.log({ simplifiedOctavedNotes })
-  //   }
-  // })
+  const correctInterval: boolean = interval
+    ? Interval.halfSteps(interval) === Interval.halfSteps(randomInterval)
+    : false
 
-  // simplifiedOctavedNotes.sort(
-  //   (a, b) => OctavedNote.toMidiNumber(a) - OctavedNote.toMidiNumber(b)
-  // )
+  useEffect(() => {
+    switch (step) {
+      case 1:
+        setRandomNote(Note.random())
+        setRandomInterval(Interval.random())
+        setHighlightedNotes([])
+        setStartNote(null)
+        setEndNote(null)
+        break
+      case 3:
+        if (correctNote && correctInterval) setCorrectCount(correctCount + 1)
+        setCount(count + 1)
+    }
+  }, [step])
 
-  // console.log("Finished notes", simplifiedOctavedNotes)
-
-  // const currentChordAndRoot = convertIntervalsToThirds(
-  //   intervalsFromNotes(simplifiedOctavedNotes)
-  // )
-  // const chordQuality =
-  //   currentChordAndRoot &&
-  //   ChordStructure.toQuality(currentChordAndRoot.intervals)
-  // const chordName = chordQuality
-  //   ? `${NamedChord.toLeadSheet({
-  //       root: simplifiedOctavedNotes[currentChordAndRoot.rootNum].note,
-  //       quality: chordQuality,
-  //     })} ${
-  //       bassNote &&
-  //       bassNote.note !== currentOctavedNotes[currentChordAndRoot.rootNum].note
-  //         ? ` / ${Note.toDisplayString(bassNote.note)}`
-  //         : ""
-  //     }`
-  //   : ""
-
-  // console.log({ currentOctavedNotes })
-  // console.log({ currentChordAndRoot })
-  // console.log({ chordQuality })
-  // console.log({ chordName })
+  console.log({ randomNote })
+  console.log({ randomInterval })
 
   const diatonicNotes =
     root &&
@@ -168,7 +161,7 @@ export function PianoPage() {
 
   return (
     <>
-      <div>
+      <div style={{ width: "100%", height: 250 }}>
         <Piano
           noteRange={{ first: firstNote, last: lastNote }}
           playNote={(midiNumber: number) => {
@@ -176,8 +169,21 @@ export function PianoPage() {
             setActiveMidiNotes((currentNotes) => [
               ...new Set([...currentNotes, midiNumber]),
             ])
-            if (!root)
-              setRoot(NoteNumber.toNote((midiNumber % 12) as NoteNumber))
+
+            switch (step) {
+              case 1:
+                setStep(2)
+                setHighlightedNotes([...highlightedNotes, midiNumber])
+                break
+              case 2:
+                setStep(3)
+                setHighlightedNotes([...highlightedNotes, midiNumber])
+                break
+              default:
+                if (!root) {
+                  setRoot(NoteNumber.toNote((midiNumber % 12) as NoteNumber))
+                }
+            }
           }}
           stopNote={(midiNumber: number) => {
             piano.stop(midiNumber)
@@ -185,19 +191,26 @@ export function PianoPage() {
               currentNotes.filter((activeNote) => activeNote !== midiNumber)
             )
           }}
-          width={1000}
           highlightedNotes={
-            diatonicNotes
-              ? diatonicNotes
-              : root
-              ? Note.toMidiNumbersForAllOctaves(root)
-              : []
+            highlightedNotes
+            // diatonicNotes
+            //   ? diatonicNotes
+            //   : root
+            //   ? Note.toMidiNumbersForAllOctaves(root)
+            //   : []
           }
           activeNotes={activeMidiNotes}
           keyboardShortcuts={keyboardShortcuts}
+          onHover={(midiNumber: number) => {
+            if (step === 1) {
+              setStartNote(midiNumber)
+            } else if (step === 2) {
+              setEndNote(midiNumber)
+            }
+          }}
         />
       </div>
-      {!root && <div>Choose a root note by playing a note on the piano</div>}
+      {/* {!root && <div>Choose a root note by playing a note on the piano</div>} */}
       {root && !scale && (
         <div>
           <div>Now select a scale!</div>
@@ -227,6 +240,50 @@ export function PianoPage() {
       )}
       <div style={{ fontSize: 200 }}>{chordName}</div>
       <RomanNumeralComponent romanNumeral={romanNumeral} />
+      <Xarrow
+        start={`${startNote}`} // The ID of the start element
+        end={endNote ? `${endNote}` : `${startNote}`} // The ID of the end element
+        color="red" // Optional: Customize the arrow color
+        headSize={8} // Optional: Customize the arrow head size
+        zIndex={1000}
+        startAnchor={{ position: "bottom", offset: { x: 0, y: -30 } }}
+        endAnchor={{ position: "bottom", offset: { x: 0, y: -30 } }}
+        path="straight"
+        passProps={{ pointerEvents: "none" }}
+      />
+
+      {/* {interval && (
+        <div style={{ fontSize: 40 }}>{Interval.name(interval)}</div>
+      )} */}
+      <div style={{ fontSize: 30 }}>
+        Find the interval of a {Interval.name(randomInterval)} starting on{" "}
+        {Note.toDisplayString(randomNote)}
+      </div>
+      {step === 3 ? (
+        <div>
+          <Button
+            onClick={() => {
+              setStep(1)
+            }}
+          >
+            Next
+          </Button>
+          {correctNote && correctInterval ? (
+            <Check
+              style={{ color: "green", transform: "scale(2)", margin: 50 }}
+            />
+          ) : (
+            <Close
+              style={{ color: "red", transform: "scale(2)", margin: 50 }}
+            />
+          )}
+        </div>
+      ) : (
+        <div style={{ margin: 40 }}></div>
+      )}
+      <div
+        style={{ padding: 5, fontSize: 30 }}
+      >{`${correctCount} / ${count}`}</div>
     </>
   )
 }

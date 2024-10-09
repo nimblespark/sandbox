@@ -2,7 +2,10 @@ import { Interval } from "./Interval"
 
 type Letter = "A" | "B" | "C" | "D" | "E" | "F" | "G"
 export namespace Letter {
-  export const validLetters = ["A", "B", "C", "D", "E", "F", "G"]
+  export const validLetters: Letter[] = ["A", "B", "C", "D", "E", "F", "G"]
+  export function random(): Letter {
+    return validLetters[Math.floor(Math.random() * 7)]
+  }
   export function toNoteNumber(letter: Letter): NoteNumber {
     switch (letter) {
       case "C":
@@ -159,6 +162,12 @@ export type Note = {
   accidental: Accidental
 }
 export const Note = {
+  random(): Note {
+    return {
+      letter: Letter.random(),
+      accidental: Math.floor(Math.random() * 3) - 1,
+    }
+  },
   toNoteNumber(note: Note): NoteNumber {
     return NoteNumber.increaseBy(
       note.accidental,
@@ -228,7 +237,10 @@ export function note(letter: Letter, accidental?: Accidental): Note {
   }
 }
 export function oNote(str: string, octave: number): OctavedNote {
-  if (str.length === 0 || !Letter.validLetters.includes(str.charAt(0)))
+  if (
+    str.length === 0 ||
+    !Letter.validLetters.includes(str.charAt(0) as Letter)
+  )
     throw new Error(
       `First letter of input string must be one of 'A B C D E F G'`
     )

@@ -54,6 +54,7 @@ export function BasicPage(props: Props) {
         </Toolbar>
       </AppBar>
       <div
+        id="basic"
         style={{
           flex: 1,
           display: "flex",
