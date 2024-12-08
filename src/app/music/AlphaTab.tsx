@@ -6,14 +6,12 @@ import { Button, Select, Slider } from "@mui/material"
 import {
   diatonicSeventhsBasedOnRoot,
   diatonicTriadsBasedOnRoot,
-  Inversion,
-  Mode,
   NamedChord,
-  Quality,
-  Scale,
-} from "./music/Music"
-import { GuitarChord, GuitarMusic, String } from "./music/Guitar"
-import { note } from "./music/MusicBasics"
+} from "../music/Music"
+import { GuitarChord, GuitarMusic, String } from "../music/Guitar"
+import { note } from "../music/MusicBasics"
+import { Inversion } from "../music/Inversion"
+import { Mode, Scale } from "../music/Scale"
 
 type Props = {
   chords: NamedChord[]
@@ -92,12 +90,7 @@ export function AlphaTab(props: Props) {
 
       const newChords = props.chords.map(
         (chord) =>
-          GuitarChord.generate(
-            chord.root,
-            chord.quality,
-            undefined,
-            Inversion.Root
-          )[0]
+          GuitarChord.generate(chord.root, chord.quality, 6, Inversion.Root)[0]
       )
 
       const guitarMusic = {
@@ -109,7 +102,7 @@ export function AlphaTab(props: Props) {
       \\tempo 120
       
       . 
-      
+
 
       ${GuitarMusic.toTex(guitarMusic)}`
 

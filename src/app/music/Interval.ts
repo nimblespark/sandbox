@@ -1,4 +1,4 @@
-import { Accidental } from "./MusicBasics"
+import { Accidental } from "./Accidental"
 
 export type Interval = { n: number; offset: Accidental }
 
@@ -7,6 +7,11 @@ export namespace Interval {
   export type Fifth = { n: 5; offset: number }
   export const unison = { n: 1, offset: 0 }
   export const octave = { n: 8, offset: 0 }
+  export const whole = { n: 2, offset: 0 }
+  export const half = { n: 2, offset: -1 }
+  export function compare(interval1: Interval, interval2: Interval) {
+    return interval1.n === interval2.n && interval1.offset === interval2.offset
+  }
   export function random(maxN: number = 8): Interval {
     return {
       n: Math.floor(Math.random() * (maxN - 1) + 1),
@@ -65,8 +70,13 @@ export namespace Interval {
 
     var offset
     // if result is perfect, add 1 to the offset
-    if (isPerfect({ n: n, offset: 0 }))
+    if (
+      isPerfect({ n: n, offset: 0 }) &&
+      !(isPerfect(interval1) || isPerfect(interval2))
+    )
       offset = interval1.offset + interval2.offset + 1
+    else if (toSimple(interval1).n === 4 && toSimple(interval2).n === 4)
+      offset = interval1.offset + interval2.offset - 1
     else offset = interval1.offset + interval2.offset
     return {
       n: n,

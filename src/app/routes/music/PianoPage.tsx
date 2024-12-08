@@ -1,22 +1,26 @@
-import { Piano, KeyboardShortcuts } from "../../my-react-piano"
 import "react-piano/dist/styles.css"
-import "./music/customPianoStyles.css"
+import "../../music/customPianoStyles.css"
 import { SplendidGrandPiano } from "smplr"
+import { Check, Close } from "@mui/icons-material"
+import { Select, MenuItem, Button } from "@mui/material"
+import { useState, useEffect } from "react"
+import Xarrow from "react-xarrows"
+import { KeyboardShortcuts, Piano } from "../../../my-react-piano"
+import { FullChord } from "../../music/FullChord"
+import { Interval } from "../../music/Interval"
 import {
-  diatonicNotesBasedOnRoot,
-  FullChord,
-  fullChordAndKeyToRomanNumeral,
   octavedNotesToChord,
   RomanNumeral,
-  Scale,
-} from "./music/Music"
-import { useEffect, useState } from "react"
-import { Button, MenuItem, Select } from "@mui/material"
-import { note, Note, NoteNumber, OctavedNote } from "./music/MusicBasics"
-import { RomanNumeralComponent } from "./music/RomanNumeralComponent"
-import Xarrow from "react-xarrows"
-import { Interval } from "./music/Interval"
-import { Check, Close } from "@mui/icons-material"
+  fullChordAndKeyToRomanNumeral,
+  diatonicNotesBasedOnRoot,
+} from "../../music/Music"
+import { note } from "../../music/MusicBasics"
+import { Note } from "../../music/Note"
+import { NoteNumber } from "../../music/NoteNumber"
+import { OctavedNote } from "../../music/OctavedNote"
+import { findNLengthProgressionsWithEnd } from "../../music/Progression"
+import { RomanNumeralComponent } from "../../music/RomanNumeralComponent"
+import { Scale } from "../../music/Scale"
 
 const context = new AudioContext()
 const piano = new SplendidGrandPiano(context)
@@ -79,12 +83,14 @@ export function PianoPage() {
     ""
 
   const interval =
-    startNote &&
-    endNote &&
-    OctavedNote.interval(
-      OctavedNote.fromMidiNumber(startNote),
-      OctavedNote.fromMidiNumber(endNote)
-    )
+    (startNote &&
+      endNote &&
+      OctavedNote.interval(
+        OctavedNote.fromMidiNumber(startNote),
+        OctavedNote.fromMidiNumber(endNote)
+      )) ??
+    null
+  console.log({ interval })
 
   const correctNote: boolean = startNote
     ? Note.toNoteNumber(randomNote) ===
@@ -95,11 +101,14 @@ export function PianoPage() {
     ? Interval.halfSteps(interval) === Interval.halfSteps(randomInterval)
     : false
 
+  console.log("random halfsteps", Interval.halfSteps(randomInterval))
+  interval && console.log("user halfsteps", Interval.halfSteps(interval))
+
   useEffect(() => {
     switch (step) {
       case 1:
         setRandomNote(Note.random())
-        setRandomInterval(Interval.random())
+        setRandomInterval(Interval.random()) //Interval.random())
         setHighlightedNotes([])
         setStartNote(null)
         setEndNote(null)
@@ -161,7 +170,7 @@ export function PianoPage() {
 
   return (
     <>
-      <div style={{ width: "100%", height: 250 }}>
+      <div style={{ width: "100%", height: "250px" }}>
         <Piano
           noteRange={{ first: firstNote, last: lastNote }}
           playNote={(midiNumber: number) => {
@@ -172,10 +181,12 @@ export function PianoPage() {
 
             switch (step) {
               case 1:
+                setStartNote(midiNumber)
                 setStep(2)
                 setHighlightedNotes([...highlightedNotes, midiNumber])
                 break
               case 2:
+                setEndNote(midiNumber)
                 setStep(3)
                 setHighlightedNotes([...highlightedNotes, midiNumber])
                 break
@@ -284,6 +295,11 @@ export function PianoPage() {
       <div
         style={{ padding: 5, fontSize: 30 }}
       >{`${correctCount} / ${count}`}</div>
+      <Button
+        onClick={() => console.log(findNLengthProgressionsWithEnd(5, 1, 1))}
+      >
+        calculate n length path
+      </Button>
     </>
   )
 }

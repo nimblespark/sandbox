@@ -15,7 +15,6 @@ export function RomanNumeralComponent(props: Props) {
       body += char
     }
   }
-  console.log({ superscript }, { subscript })
 
   return (
     <div style={{ fontSize: 200, color: "grey" }}>

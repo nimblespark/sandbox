@@ -5,14 +5,22 @@ import {
   IconButton,
   Radio,
   RadioGroup,
+  Slider,
 } from "@mui/material"
-import { BasicPage } from "../BasicPage"
-import { Inversion, NamedChord, Quality } from "./music/Music"
+import { BasicPage } from "../../BasicPage"
+import { NamedChord } from "../../music/Music"
 import { useState } from "react"
-import { useViewport } from "../../useViewport"
+import { useViewport } from "../../../useViewport"
 import { Close, Delete } from "@mui/icons-material"
-import { AlphaTab } from "./AlphaTab"
-import { Accidental, note, Note, NoteNumber } from "./music/MusicBasics"
+import { note } from "../../music/MusicBasics"
+import { Note } from "../../music/Note"
+import { Accidental } from "../../music/Accidental"
+import { NoteNumber } from "../../music/NoteNumber"
+import { Quality } from "../../music/Quality"
+import { findNLengthProgressionsWithEnd } from "../../music/Progression"
+import { Scale } from "../../music/Scale"
+import { allCombinations } from "../../music/Harmony"
+import { AlphaTabPlayground } from "../../music/AlphaTabPlayground"
 
 const notes: Note[] = [
   note("C"),
@@ -35,6 +43,8 @@ const qualities: Quality[] = [
   Quality.Min7,
   Quality.Half,
   Quality.Full,
+  Quality.Maj,
+  Quality.Min,
 ]
 
 export function ProgressionPage() {
@@ -43,7 +53,27 @@ export function ProgressionPage() {
   const [chords, setChords] = useState<NamedChord[]>([])
   const [alphaDialogOpen, setAlphaDialogOpen] = useState<boolean>(false)
 
+  const [length, setLength] = useState<number>(4)
+
   const { isMobile } = useViewport()
+
+  function handleRandom() {
+    const progressions = findNLengthProgressionsWithEnd(length + 1, 1, 1, {
+      mustHaveSecondaryDominant: true,
+    })
+    const progression =
+      progressions[Math.floor(Math.random() * progressions.length)]
+    progression.pop()
+    setChords(
+      progression.map((chord) =>
+        NamedChord.fromKeyAndScaleDegree(
+          { note: note("C"), scale: Scale.MajorScale },
+          chord
+          //true
+        )
+      )
+    )
+  }
   return (
     <BasicPage title="Progression">
       <div
@@ -96,6 +126,21 @@ export function ProgressionPage() {
         <IconButton onClick={() => setChords([])}>
           <Delete />
         </IconButton>
+        <Button onClick={handleRandom}>Random</Button>
+        <div style={{ height: 40 }}></div>
+        <Slider
+          min={1}
+          max={8}
+          valueLabelDisplay="on"
+          value={length}
+          onChange={(_, value) => setLength(value as number)}
+        >
+          Length
+        </Slider>
+
+        <Button onClick={() => console.log(allCombinations([1, 2, 3]))}>
+          Generate possibilities
+        </Button>
       </div>
 
       {alphaDialogOpen && (
@@ -121,7 +166,7 @@ export function ProgressionPage() {
           >
             <Close />
           </IconButton>
-          <AlphaTab chords={chords} />
+          <AlphaTabPlayground chords={chords} />
         </Dialog>
       )}
     </BasicPage>

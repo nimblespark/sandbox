@@ -1,9 +1,13 @@
+import { FullChord } from "./FullChord"
 import { Interval } from "./Interval"
-import { FullChord, Inversion, Mode, Quality } from "./Music"
-import { Note, note } from "./MusicBasics"
+import { Inversion } from "./Inversion"
+import { note } from "./MusicBasics"
+import { Note } from "./Note"
+import { Quality } from "./Quality"
+import { Mode } from "./Scale"
 
 const fretsCount = 24
-const lowestFret = 0
+const lowestFret = 1
 
 export type String = 1 | 2 | 3 | 4 | 5 | 6
 export namespace String {
@@ -191,7 +195,7 @@ export const GuitarChord = {
   toTex(chord: GuitarChord) {
     return `(${chord.notes
       .map((note) => GuitarNote.toTex(note) + " ")
-      .join("")}).1${chord.name && `{ch "${chord.name}"}`}|`
+      .join("")}).1${chord.name && `{ch "${chord.name}"}`}`
   },
   /** Generates all the guitar chords that fit the parameters */
   generate(
@@ -201,9 +205,10 @@ export const GuitarChord = {
     inversion?: Inversion
   ): GuitarChord[] {
     var chords: GuitarChord[] = []
-    const inversions = inversion
-      ? [inversion]
-      : [Inversion.Root, Inversion.First, Inversion.Second, Inversion.Third]
+    const inversions =
+      inversion !== undefined
+        ? [inversion]
+        : [Inversion.Root, Inversion.First, Inversion.Second, Inversion.Third]
 
     for (const inversion of inversions) {
       const bassNote = FullChord.bassNote({

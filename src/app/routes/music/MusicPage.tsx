@@ -1,7 +1,7 @@
+import React from "react"
+
 import {
   Button,
-  Card,
-  Checkbox,
   Dialog,
   DialogTitle,
   Divider,
@@ -11,16 +11,17 @@ import {
   Switch,
   Typography,
 } from "@mui/material"
-import { CSSProperties, ReactElement, useState } from "react"
-import {
-  Controller,
-  ControllerFieldState,
-  ControllerRenderProps,
-  FieldValues,
-  useForm,
-  UseFormStateReturn,
-} from "react-hook-form"
-import { BasicPage } from "../BasicPage"
+import { CSSProperties, useState } from "react"
+import { Close } from "@mui/icons-material"
+import { useViewport } from "../../../useViewport"
+import { BasicPage } from "../../BasicPage"
+import { Accidental } from "../../music/Accidental"
+import { AlphaTab } from "../../music/AlphaTab"
+import { GuitarMusic, GuitarChord } from "../../music/Guitar"
+import { Inversion } from "../../music/Inversion"
+import { note } from "../../music/MusicBasics"
+import { Note } from "../../music/Note"
+import { Quality } from "../../music/Quality"
 
 type String = 5 | 6
 
@@ -53,15 +54,6 @@ const defaultQualities = [
   Quality.Half,
   Quality.Full,
 ]
-
-import React from "react"
-import { maxHeight } from "@mui/system"
-import { Inversion, Quality } from "./music/Music"
-import { AlphaTab } from "./AlphaTab"
-import { Close } from "@mui/icons-material"
-import { useViewport } from "../../useViewport"
-import { GuitarChord, GuitarMusic } from "./music/Guitar"
-import { Accidental, note, Note } from "./music/MusicBasics"
 
 const styles = {
   container: {
