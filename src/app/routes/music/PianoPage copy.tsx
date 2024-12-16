@@ -107,8 +107,6 @@ export function PianoPage() {
   useEffect(() => {
     switch (step) {
       case 1:
-        setRandomNote(Note.random())
-        setRandomInterval(Interval.random()) //Interval.random())
         setHighlightedNotes([])
         setStartNote(null)
         setEndNote(null)
@@ -118,6 +116,9 @@ export function PianoPage() {
         setCount(count + 1)
     }
   }, [step])
+
+  console.log({ randomNote })
+  console.log({ randomInterval })
 
   const diatonicNotes =
     root &&
@@ -131,7 +132,7 @@ export function PianoPage() {
     if (event.data) {
       const note = event.data[1]
       const velocity = event.data[2]
-      console.log(note, velocity)
+      // console.log(note, velocity)
       if (velocity === 0) {
         setActiveMidiNotes((currentNotes) =>
           currentNotes.filter((activeNote) => activeNote !== note)

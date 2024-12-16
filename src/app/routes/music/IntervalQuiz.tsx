@@ -131,7 +131,7 @@ export function IntervalQuiz() {
     if (event.data) {
       const note = event.data[1]
       const velocity = event.data[2]
-      // console.log(note, velocity)
+      console.log(note, velocity)
       if (velocity === 0) {
         setActiveMidiNotes((currentNotes) =>
           currentNotes.filter((activeNote) => activeNote !== note)

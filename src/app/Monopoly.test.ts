@@ -1,5 +1,5 @@
 import { expect, test } from "vitest"
-import { rollDice, runGame } from "./Monopoly"
+import { rollDice, runGame } from "./monopoly/Monopoly"
 
 test("roll dice", () => {
   const dice = rollDice()

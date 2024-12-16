@@ -11,6 +11,8 @@ export enum Quality {
   Min = "Min",
   Dim = "Dim",
   Aug = "Aug",
+  Sus2 = "Sus 2",
+  Sus4 = "Sus 4",
 }
 export namespace Quality {
   export function toLeadSheet(quality: Quality): string {
@@ -33,6 +35,10 @@ export namespace Quality {
         return "°"
       case Quality.Aug:
         return "+"
+      case Quality.Sus2:
+        return "sus2"
+      case Quality.Sus4:
+        return "sus4"
     }
   }
   export function isMajor(quality: Quality): boolean {
@@ -68,6 +74,10 @@ export namespace Quality {
         return [interval("m3"), interval("m3")] as Triad
       case Quality.Aug:
         return [interval("M3"), interval("M3")] as Triad
+      case Quality.Sus2:
+        return [interval("M2"), interval("p4")]
+      case Quality.Sus4:
+        return [interval("p4"), interval("M2")]
     }
   }
 }

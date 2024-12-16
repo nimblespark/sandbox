@@ -1,8 +1,8 @@
 import { BarChart } from "@mui/x-charts"
-import { historyToProbabilities, runGame, Square } from "../Monopoly"
+import { historyToProbabilities, runGame, Square } from "./Monopoly"
 import { Tab, Tabs } from "@mui/material"
 import { useState } from "react"
-import { MonopolyTable } from "../MonopolyTable"
+import { MonopolyTable } from "./MonopolyTable"
 
 export function MonopolyResultsPage() {
   const [tab, setTab] = useState(1)

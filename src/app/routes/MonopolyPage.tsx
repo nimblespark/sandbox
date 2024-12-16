@@ -1,6 +1,6 @@
 import { Slider } from "@mui/material"
 import React, { useState } from "react"
-import { runGame, Square } from "../Monopoly"
+import { runGame, Square } from "../monopoly/Monopoly"
 
 interface MonopolyBoardComponentProps {
   currentSquare: Square // The current square to draw the marker on

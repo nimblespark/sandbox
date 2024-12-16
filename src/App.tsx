@@ -14,7 +14,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 
 import { MelodyPage } from "./app/routes/music/MelodyPage"
 import { MonopolyBoardComponent, MonopolyPage } from "./app/routes/MonopolyPage"
-import { MonopolyResultsPage } from "./app/routes/MonopolyResultsPage"
+import { MonopolyResultsPage } from "./app/monopoly/MonopolyResultsPage"
 import { MathPage } from "./app/routes/MathPage"
 import { MathQuiz } from "./app/routes/MathQuiz"
 import { IntervalQuiz } from "./app/routes/music/IntervalQuiz"
@@ -22,6 +22,7 @@ import { MusicPage } from "./app/routes/music/MusicPage"
 import { PianoPage } from "./app/routes/music/PianoPage"
 import { ProgressionPage } from "./app/routes/music/ProgressionPage"
 import { SheetMusicPage } from "./app/routes/music/SheetMusic"
+import { PodcastPage } from "./app/routes/Podcast"
 
 export function App() {
   // const elementRef = useRef<HTMLDivElement>(null)
@@ -122,6 +123,7 @@ export function App() {
         path: "/monopoly-results",
         element: <MonopolyResultsPage />,
       },
+      { path: "/podcast", element: <PodcastPage /> },
     ]
     // { basename: window.location.pathname }
   )
