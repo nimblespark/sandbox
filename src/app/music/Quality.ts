@@ -13,6 +13,8 @@ export enum Quality {
   Aug = "Aug",
   Sus2 = "Sus 2",
   Sus4 = "Sus 4",
+  Maj6 = "Major 6",
+  Min6 = "Minor 6",
 }
 export namespace Quality {
   export function toLeadSheet(quality: Quality): string {
@@ -39,6 +41,10 @@ export namespace Quality {
         return "sus2"
       case Quality.Sus4:
         return "sus4"
+      case Quality.Maj6:
+        return "6"
+      case Quality.Min6:
+        return "m6"
     }
   }
   export function isMajor(quality: Quality): boolean {
@@ -78,6 +84,10 @@ export namespace Quality {
         return [interval("M2"), interval("p4")]
       case Quality.Sus4:
         return [interval("p4"), interval("M2")]
+      case Quality.Maj6:
+        return [interval("M3"), interval("m3"), interval("M2")]
+      case Quality.Min6:
+        return [interval("m3"), interval("M3"), interval("M2")]
     }
   }
 }

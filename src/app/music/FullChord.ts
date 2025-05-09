@@ -34,7 +34,6 @@ export namespace FullChord {
     var sum: Interval[] = []
     for (let i = 0; i < inversion; i++) {
       sum.push(intervals[i])
-      console.log("Is this undefined", intervals[i])
     }
 
     const bassNote = Note.transpose(Interval.add(sum), root)

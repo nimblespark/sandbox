@@ -8,7 +8,7 @@ import {
   Slider,
 } from "@mui/material"
 import { BasicPage } from "../../BasicPage"
-import { NamedChord } from "../../music/Music"
+import { NamedChord, RaisedFunction, rn } from "../../music/Music"
 import { useState } from "react"
 import { useViewport } from "../../../useViewport"
 import { Close, Delete } from "@mui/icons-material"
@@ -17,7 +17,11 @@ import { Note } from "../../music/Note"
 import { Accidental } from "../../music/Accidental"
 import { NoteNumber } from "../../music/NoteNumber"
 import { Quality } from "../../music/Quality"
-import { findNLengthProgressionsWithEnd } from "../../music/Progression"
+import {
+  findNLengthProgressionsWithEnd,
+  findNLengthProgressionsWithEnd2,
+  functionToNamedChord,
+} from "../../music/Progression"
 import { Scale } from "../../music/Scale"
 import { allCombinations } from "../../music/Harmony"
 import { AlphaTabPlayground } from "../../music/AlphaTabPlayground"
@@ -51,6 +55,7 @@ export function ProgressionPage() {
   const [root, setRoot] = useState<NoteNumber>(0)
   const [quality, setQuality] = useState<Quality>(Quality.Maj7)
   const [chords, setChords] = useState<NamedChord[]>([])
+  const [numerals, setNumerals] = useState<RaisedFunction[]>([])
   const [alphaDialogOpen, setAlphaDialogOpen] = useState<boolean>(false)
 
   const [length, setLength] = useState<number>(4)
@@ -58,21 +63,16 @@ export function ProgressionPage() {
   const { isMobile } = useViewport()
 
   function handleRandom() {
-    const progressions = findNLengthProgressionsWithEnd(length + 1, 1, 1, {
-      mustHaveSecondaryDominant: true,
-    })
+    const progressions = findNLengthProgressionsWithEnd2(length, "i", "I")
     const progression =
       progressions[Math.floor(Math.random() * progressions.length)]
-    progression.pop()
+    //progression.pop()
     setChords(
       progression.map((chord) =>
-        NamedChord.fromKeyAndScaleDegree(
-          { note: note("C"), scale: Scale.MajorScale },
-          chord
-          //true
-        )
+        functionToNamedChord(note("C"), chord, { allSevenths: true })
       )
     )
+    setNumerals(progression.map((chord) => rn(chord)))
   }
   return (
     <BasicPage title="Progression">
@@ -166,7 +166,7 @@ export function ProgressionPage() {
           >
             <Close />
           </IconButton>
-          <AlphaTabPlayground chords={chords} />
+          <AlphaTabPlayground chords={chords} numerals={numerals} />
         </Dialog>
       )}
     </BasicPage>

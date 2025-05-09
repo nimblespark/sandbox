@@ -22,6 +22,12 @@ export namespace OctavedNote {
   export function toMidiNumber(note: OctavedNote) {
     return Note.toNoteNumber(note.note) + note.octave * 12
   }
+  /**
+   * Intervals should be in ascending order
+   * @param note1
+   * @param note2
+   * @returns
+   */
   export function interval(note1: OctavedNote, note2: OctavedNote): Interval {
     var currentN = 1
     var currentLetter = note1.note.letter

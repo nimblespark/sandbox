@@ -20,6 +20,8 @@ interface SimpleNote {
   step: string
   octave: number
 }
+
+const key = { note: note("C"), scale: Scale.MajorScale }
 export function MelodyPage() {
   const [melody, setMelody] = useState<OctavedNote[]>([
     oNote("C", 4),
@@ -64,6 +66,7 @@ export function MelodyPage() {
   const [notes, setNotes] = useState<OctavedNote[] | null>(null)
   const [harmony, setHarmony] = useState<OctavedHarmonyProgression | null>(null)
   const [progression, setProgression] = useState<NamedChord[] | null>(null)
+  const [progressions, setProgressions] = useState<NamedChord[][] | null>(null)
 
   const tex = notes && notes.map(OctavedNote.toTex).join(" ")
 
@@ -109,10 +112,10 @@ export function MelodyPage() {
 
     return notes
   }
-  const key = { note: note("C"), scale: Scale.MajorScale }
 
-  const progressions = notes && findProgresionForMelody(notes, key)
-  console.log(progressions)
+  useEffect(() => {
+    setProgressions(notes && findProgresionForMelody(notes, key))
+  }, [notes, key])
 
   // useEffect(() => {
   //   setProgression(
@@ -126,9 +129,9 @@ export function MelodyPage() {
   //   )
   // }, [progressions, notes])
 
-  useEffect(() => {
-    regenerateHarmony()
-  }, [progression])
+  // useEffect(() => {
+  //   regenerateHarmony()
+  // }, [progression])
 
   function regenerateProgression() {
     setProgression(
@@ -172,6 +175,8 @@ export function MelodyPage() {
       {/* Display the parsed XML data */}
       <div>{tex && <Alpha tex={tex} beat={undefined} />}</div>
       {tex2 && <Alpha tex={tex2} />}
+
+      {progression?.map(NamedChord.toLeadSheet).join(" ")}
       {<Button onClick={regenerateHarmony}>Regenerate</Button>}
       {<Button onClick={regenerateProgression}>New Progresion</Button>}
     </div>

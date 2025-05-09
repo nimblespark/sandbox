@@ -1,4 +1,5 @@
 import { rotateBy } from "../helpers"
+import { Accidental } from "./Accidental"
 import { ChordStructure, Seventh, Shell, Triad } from "./ChordStructure"
 import { FullChord } from "./FullChord"
 import { Interval, interval } from "./Interval"
@@ -9,6 +10,18 @@ import { OctavedNote } from "./OctavedNote"
 import { SecondaryDominant } from "./Progression"
 import { Quality } from "./Quality"
 import { Scale, ScaleDegree } from "./Scale"
+
+export type FiguredBass = "6" | "64" | "7" | "65" | "43" | "42" | undefined
+export const FiguredBass = {
+  isSeventh: (figuredBass: FiguredBass): boolean => {
+    return (
+      figuredBass === "7" ||
+      figuredBass === "65" ||
+      figuredBass === "43" ||
+      figuredBass === "42"
+    )
+  },
+}
 
 function diatonicTriad(scaleDegree: ScaleDegree, scale: Scale): Triad {
   const mode = rotateBy(scaleDegree - 1, scale)
@@ -128,11 +141,6 @@ export function diatonicTriadsBasedOnRoot(
     })
 }
 
-console.log(
-  "diatonic triads in c",
-  diatonicTriadsBasedOnRoot(note("C"), Scale.MajorScale)
-)
-
 export function diatonicSeventhsBasedOnRoot(
   root: Note,
   scale: Scale
@@ -204,15 +212,7 @@ function rootPositionShellToSeventh(intervals: Shell): Seventh {
 
   return [firstInterval, fifth, seventh]
 }
-// console.log(
-//   "TESTING SHELL",
-//   Scale.toDisplayString(
-//     rootPositionShellToSeventh([
-//       { n: 3, offset: 0 },
-//       { n: 5, offset: 0 },
-//     ])
-//   )
-// )
+
 export function convertIntervalsToThirds(
   intervals: Interval[]
 ): { intervals: Interval[]; inversion: Inversion; rootNum: number } | null {
@@ -229,15 +229,10 @@ export function convertIntervalsToThirds(
   var newIntervalList = intervals
 
   for (let i = 0; i < intervals.length; i++) {
-    // console.log(i, Scale.toDisplayString(newIntervalList))
-    //console.log("inverted", Interval.invert(newIntervalList[0]))
     const newInterval = Interval.subtract(
       Interval.invert(newIntervalList[0]),
       Interval.add(newIntervalList.slice(1, newIntervalList.length))
     )
-    //console.log("interval to add on top", newInterval)
-    const remainingIntervals = newIntervalList.slice(1, intervals.length)
-    //console.log({ remainingIntervals })
     newIntervalList = [
       ...newIntervalList.slice(1, intervals.length),
       newInterval,
@@ -279,9 +274,45 @@ export function convertIntervalsToThirds(
   return null
 }
 
-//console.log("XXXX ", convertIntervalsToThirds(MajorTriad))
+/**
+ *
+ * @param currentOctavedNotes
+ * @returns the notes simplified to the lowest octave above the bass note
+ */
+export function simplifyOctavedNotes(currentOctavedNotess: OctavedNote[]) {
+  console.log("simplifying", currentOctavedNotess.map(OctavedNote.toTex))
+  const currentOctavedNotes = [...currentOctavedNotess]
+  const bassNote =
+    currentOctavedNotes.length > 0 ? currentOctavedNotes[0] : null
 
-//console.log("subtrackt", Interval.subtract(interval("p5"), interval("M3")))
+  var simplifiedOctavedNotes: OctavedNote[] = bassNote ? [bassNote] : []
+
+  currentOctavedNotes.forEach((potential) => {
+    // if this is a unique note, add it to the simplified list in it's lowest position that's still above the bass
+    if (
+      !simplifiedOctavedNotes.some(
+        (element) =>
+          Note.toNoteNumber(element.note) === Note.toNoteNumber(potential.note)
+      )
+    ) {
+      var noteToAdd = potential
+      while (
+        bassNote &&
+        OctavedNote.toMidiNumber(noteToAdd) >
+          OctavedNote.toMidiNumber(bassNote) + 11
+      ) {
+        noteToAdd = { note: potential.note, octave: noteToAdd.octave - 1 }
+      }
+      simplifiedOctavedNotes.push(noteToAdd)
+    }
+  })
+
+  simplifiedOctavedNotes.sort(
+    (a, b) => OctavedNote.toMidiNumber(a) - OctavedNote.toMidiNumber(b)
+  )
+
+  return simplifiedOctavedNotes
+}
 
 export function octavedNotesToChord(
   currentOctavedNotes: OctavedNote[]
@@ -302,21 +333,18 @@ export function octavedNotesToChord(
       var noteToAdd = potential
       while (
         bassNote &&
-        OctavedNote.toMidiNumber(potential) >
+        OctavedNote.toMidiNumber(noteToAdd) >
           OctavedNote.toMidiNumber(bassNote) + 11
       ) {
-        noteToAdd.octave--
+        noteToAdd = { note: potential.note, octave: noteToAdd.octave - 1 }
       }
       simplifiedOctavedNotes.push(noteToAdd)
-      console.log({ simplifiedOctavedNotes })
     }
   })
 
   simplifiedOctavedNotes.sort(
     (a, b) => OctavedNote.toMidiNumber(a) - OctavedNote.toMidiNumber(b)
   )
-
-  console.log("Finished notes", simplifiedOctavedNotes)
 
   const currentChordAndRoot = convertIntervalsToThirds(
     intervalsFromNotes(simplifiedOctavedNotes)
@@ -352,14 +380,14 @@ export function fullChordAndKeyToRomanNumeral(
   }
 }
 
-type RomanNumeral = {
+export type RomanNumeral = {
   interval: Interval
   quality: Quality
   inversion: Inversion
 }
 
-export namespace RomanNumeral {
-  export function toDisplayString(roman: RomanNumeral) {
+export const RomanNumeral = {
+  toDisplayString(roman: RomanNumeral) {
     if (roman.interval.n < 1 || roman.interval.n > 7)
       throw new Error(
         `Interval has to be a possible scale degree but was ${Interval.name(
@@ -431,33 +459,176 @@ export namespace RomanNumeral {
       }
     }
     return n + suffix
+  },
+  fromString(string: string): RomanNumeral {
+    const match = string.match(
+      /(?<accidental>[♭#♮])?(?<rn>[IViv]+)(?<quality>[°ø])?(?<inv>64|65|43|42|66|6|7)?/
+    )
+    if (!match) throw new Error(`Invalid roman numeral: ${string}`)
+    const accidental = match[1]
+    const romanNumeral = match[2]
+    const symbol = match[3]
+    const figuredBass = match[4] as FiguredBass
+    var inter: Interval = interval("p1")
+    var quality: Quality = Quality.Maj
+    var inversion: Inversion = Inversion.Root
+    switch (figuredBass) {
+      case "6":
+        inversion = Inversion.First
+        break
+      case "64":
+        inversion = Inversion.Second
+        break
+      case "7":
+        inversion = Inversion.Root
+        break
+      case "65":
+        inversion = Inversion.First
+        break
+      case "43":
+        inversion = Inversion.Second
+        break
+      case "42":
+        inversion = Inversion.Third
+        break
+    }
+    switch (romanNumeral) {
+      case "I":
+        quality = !FiguredBass.isSeventh(figuredBass)
+          ? Quality.Maj
+          : Quality.Maj7
+        break
+      case "ii":
+        inter = interval("M2")
+        quality = !FiguredBass.isSeventh(figuredBass)
+          ? Quality.Min
+          : Quality.Min7
+        break
+      case "iii":
+        inter = interval("M3")
+        quality = !FiguredBass.isSeventh(figuredBass)
+          ? Quality.Min
+          : Quality.Min7
+        break
+      case "IV":
+        inter = interval("p4")
+        quality = !FiguredBass.isSeventh(figuredBass)
+          ? Quality.Maj
+          : Quality.Maj7
+        break
+      case "V":
+        inter = interval("p5")
+        quality = !FiguredBass.isSeventh(figuredBass)
+          ? Quality.Maj
+          : Quality.Dom7
+        break
+      case "vi":
+        inter = interval("M6")
+        quality = !FiguredBass.isSeventh(figuredBass)
+          ? Quality.Min
+          : Quality.Min7
+        break
+      case "vii":
+        inter = interval("M7")
+        break
+      case "i":
+        quality = !FiguredBass.isSeventh(figuredBass)
+          ? Quality.Min
+          : Quality.Min7
+        break
+      case "III":
+        inter = interval("m3")
+        quality = !FiguredBass.isSeventh(figuredBass)
+          ? Quality.Maj
+          : Quality.Maj7
+        break
+      case "iv":
+        inter = interval("p4")
+        quality = !FiguredBass.isSeventh(figuredBass)
+          ? Quality.Min
+          : Quality.Min7
+        break
+      case "v":
+        inter = interval("p5")
+        quality = !FiguredBass.isSeventh(figuredBass)
+          ? Quality.Min
+          : Quality.Min7
+        break
+      case "VI":
+        inter = interval("m6")
+        quality = !FiguredBass.isSeventh(figuredBass)
+          ? Quality.Maj
+          : Quality.Maj7
+        break
+      case "VII":
+        inter = interval("m7")
+        quality = !FiguredBass.isSeventh(figuredBass)
+          ? Quality.Maj
+          : Quality.Dom7
+        break
+      default:
+        throw new Error(`Invalid roman numeral: ${string}`)
+    }
+    if (symbol) {
+      switch (symbol) {
+        case "°":
+          quality = !FiguredBass.isSeventh(figuredBass)
+            ? Quality.Dim
+            : Quality.Full
+          break
+        case "ø":
+          quality = Quality.Half
+          break
+        default:
+          throw new Error(`Invalid quality symbol: ${symbol}`)
+      }
+    }
+
+    return { interval: inter, quality, inversion }
+  },
+  toNamedChord(roman: RomanNumeral, tonic: Note): NamedChord {
+    const root = Note.transpose(roman.interval, tonic)
+    const chord = {
+      root: root,
+      quality: roman.quality,
+    }
+    return chord
+  },
+  toFullChord(roman: RomanNumeral, tonic: Note): FullChord {
+    const root = Note.transpose(roman.interval, tonic)
+    const chord = {
+      root: root,
+      quality: roman.quality,
+    }
+    return { chord, inversion: roman.inversion }
+  },
+}
+
+export type RaisedFunction = RomanNumeral[]
+
+export namespace RaisedFunction {
+  export function toDisplayString(roman: RaisedFunction): string {
+    return roman
+      .map((r) => RomanNumeral.toDisplayString(r))
+      .reduce((acc, curr) => acc + "/" + curr)
+  }
+  export function toNamedChord(roman: RaisedFunction, tonic: Note): NamedChord {
+    switch (roman.length) {
+      case 0:
+        throw new Error("Empty roman numeral")
+      case 1:
+        return RomanNumeral.toNamedChord(roman[0], tonic)
+      default:
+        return toNamedChord(
+          roman.slice(0, -1),
+          Note.transpose(roman[roman.length - 1].interval, tonic)
+        )
+    }
   }
 }
 
-console.log(
-  "test",
-  Note.transpose(
-    Scale.MajorScale.slice(0, 4).reduce<Interval>(
-      (partialSum, a) => Interval.add2(partialSum, a),
-      Interval.unison
-    ),
-    note("C")
-  )
-)
-
-console.log(
-  "interval",
-  Scale.MajorScale.slice(0, 4).reduce<Interval>(
-    (partialSum, a) => Interval.add2(partialSum, a),
-    Interval.unison
-  )
-)
-
-console.log(
-  "intervals",
-  Scale.MajorScale.slice(0, 4)
-  // .reduce<Interval>(
-  //   (partialSum, a) => Interval.add2(partialSum, a),
-  //   Interval.unison
-  // )
-)
+export function rn(string: string): RaisedFunction {
+  return string.split("/").map((num) => {
+    return RomanNumeral.fromString(num)
+  })
+}

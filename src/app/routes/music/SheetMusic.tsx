@@ -1,6 +1,6 @@
 import { Button } from "@mui/material"
 import { useState } from "react"
-import SheetMusic from "react-sheet-music"
+//import SheetMusic from "react-sheet-music"
 import { SplendidGrandPiano } from "smplr"
 import { OctavedNote } from "../../music/OctavedNote"
 

@@ -23,47 +23,12 @@ import { PianoPage } from "./app/routes/music/PianoPage"
 import { ProgressionPage } from "./app/routes/music/ProgressionPage"
 import { SheetMusicPage } from "./app/routes/music/SheetMusic"
 import { PodcastPage } from "./app/routes/Podcast"
+import { LoginPage } from "./app/HangTime/LoginPage"
+import { Chat } from "./Chat"
+import { useEffect } from "react"
+import { VoiceLeadingErrors } from "./app/music/VoiceLeadingErrors"
 
 export function App() {
-  // const elementRef = useRef<HTMLDivElement>(null)
-  // const apiRef = useRef<AlphaTabApi | null>(null)
-
-  // useEffect(() => {
-  //   console.log("USE EFFECT", elementRef.current)
-  //   if (elementRef.current) {
-  //     apiRef.current = new AlphaTabApi(elementRef.current, {
-  //       core: {
-  //         // file: "https://www.alphatab.net/files/canon.gp",
-  //         fontDirectory: "/font/",
-  //       },
-  //       player: {
-  //         enablePlayer: true,
-  //         enableCursor: true,
-  //         enableUserInteraction: true,
-  //         soundFont: "/soundfont/sonivox.sf2",
-  //       },
-  //     } as Settings)
-
-  //     console.log("SETTING TEX", apiRef.current)
-  //     apiRef.current.tex(`
-  //       \\title "Hello alphaTab"
-  //       .
-  //       :4 0.6 1.6 3.6 0.5 | 2.5 3.5 0.4 2.4 |
-  //           3.4 0.3 2.3 0.2 | 1.2 3.2 0.1 1.1 |
-  //           3.1.1
-  //     `)
-
-  //     // setApi(api)
-  //   }
-  //   return () => {
-  //     console.log("destroy", elementRef, apiRef.current)
-  //     apiRef.current?.destroy()
-  //   }
-  // }, [])
-
-  // function playPause() {
-  //   apiRef.current?.playPause()
-  // }
   const router = createHashRouter(
     [
       {
@@ -124,6 +89,9 @@ export function App() {
         element: <MonopolyResultsPage />,
       },
       { path: "/podcast", element: <PodcastPage /> },
+      { path: "/login", element: <LoginPage /> },
+      { path: "/chat", element: <Chat /> },
+      { path: "/voice", element: <VoiceLeadingErrors /> },
     ]
     // { basename: window.location.pathname }
   )

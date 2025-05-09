@@ -4,19 +4,24 @@ import { AlphaTabApi, Settings } from "@coderline/alphatab"
 import { Button, Select, Slider } from "@mui/material"
 import { GuitarChord, GuitarMusic } from "./Guitar"
 import { Inversion } from "./Inversion"
-import { NamedChord, diatonicSeventhsBasedOnRoot } from "./Music"
+import {
+  NamedChord,
+  RaisedFunction,
+  diatonicSeventhsBasedOnRoot,
+} from "./Music"
 import { note, oNote } from "./MusicBasics"
 import { Mode, Scale } from "./Scale"
 import { OctavedNote } from "./OctavedNote"
 import { Harmony, OctavedHarmony, OctavedHarmonyProgression } from "./Harmony"
-import SheetMusic from "react-sheet-music"
+//import SheetMusic from "react-sheet-music"
 import { Soundfont, SplendidGrandPiano } from "smplr"
 
 const context = new AudioContext()
-const choir = new Soundfont(context, { instrument: "choir_aahs" })
+const choir = new Soundfont(context, { instrument: "piano" })
 
 type Props = {
   chords: NamedChord[]
+  numerals: RaisedFunction[]
 }
 
 export function AlphaTabPlayground(props: Props) {
@@ -25,7 +30,7 @@ export function AlphaTabPlayground(props: Props) {
   const [isPlaying, setIsPlaying] = useState(false)
 
   const [harmony, setHarmony] = useState(
-    Harmony.harmoniesFromNamedChords(props.chords)
+    Harmony.harmoniesFromNamedChordsContext(props.chords, props.numerals)
   )
 
   const { bass, tenor, alto, soprano } =
@@ -121,7 +126,7 @@ export function AlphaTabPlayground(props: Props) {
 
       
       \\track "Piano with Grand Staff" "pno."
-    \\staff{score} \\tuning piano \\instrument 52 \\tempo 60
+    \\staff{score} \\tuning piano \\instrument 5 \\tempo 60
     
     ${OctavedHarmonyProgression.toTex(harmony)} 
     
@@ -173,7 +178,7 @@ export function AlphaTabPlayground(props: Props) {
         >
           Tempo
         </Slider>
-        <SheetMusic
+        {/* <SheetMusic
           onEvent={(event: any) => {
             console.log(event)
             choir.stop()
@@ -188,7 +193,7 @@ export function AlphaTabPlayground(props: Props) {
           isPlaying={isPlaying}
           notation={abc}
           bpm={30}
-        />
+        /> */}
       </div>
       <Button
         onClick={() => {
@@ -200,7 +205,12 @@ export function AlphaTabPlayground(props: Props) {
       </Button>
       <Button
         onClick={() =>
-          setHarmony(Harmony.harmoniesFromNamedChords(props.chords))
+          setHarmony(
+            Harmony.harmoniesFromNamedChordsContext(
+              props.chords,
+              props.numerals
+            )
+          )
         }
       >
         Regenerate

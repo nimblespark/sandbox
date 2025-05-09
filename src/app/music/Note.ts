@@ -30,23 +30,6 @@ export const Note = {
   },
 
   interval(note1: Note, note2: Note): Interval {
-    console.log(note1, note2)
-    console.log(
-      "interval:",
-      OctavedNote.interval(
-        { note: note1, octave: 1 },
-        { note: note2, octave: 2 }
-      )
-    )
-    console.log(
-      "simple interval:",
-      Interval.toSimple(
-        OctavedNote.interval(
-          { note: note1, octave: 1 },
-          { note: note2, octave: 2 }
-        )
-      )
-    )
     return Interval.toSimple(
       OctavedNote.interval(
         { note: note1, octave: 1 },
@@ -78,6 +61,11 @@ export const Note = {
   fromMidiNumber(midiNum: number) {
     return NoteNumber.toNote((midiNum % 12) as NoteNumber)
   },
+  /**
+   * Remove unecessary accidentals (E# -> F, B# -> C) and vice versa (Fb -> E, Cb -> B)
+   * @param n
+   * @returns
+   */
   toNormal(n: Note) {
     if (n.letter === "E" && n.accidental === 1) return note("F")
     if (n.letter === "F" && n.accidental === -1) return note("E")
