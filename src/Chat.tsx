@@ -25,7 +25,8 @@ export function Chat() {
     try {
       const client = new OpenAI({
         apiKey:
-          "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", // Keep secure in .env file
+          // Create new key, this one is broken
+          "need new key", // Keep secure in .env file
         dangerouslyAllowBrowser: true,
       })
 
